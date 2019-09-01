@@ -1,0 +1,50 @@
+{
+  "name": "datecalculator",
+  "version": "0.0.1",
+  "description": "Evalate a date expression (\"now + 3 days\")!",
+  "main": "dist/datecalculator.js",
+  "scripts": {
+    "build": "webpack",
+    "build:all": "yarn build:browser && yarn build:node",
+    "build:browser": "webpack && cp dist/datecalculator.js examples/browser",
+    "build:node": "webpack && cp dist/datecalculator.js examples/node/ && node examples/node/example.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zyclotrop-j/DateCalculator.git"
+  },
+  "keywords": [
+    "date",
+    "js",
+    "date-fns",
+    "moment",
+    "luxon",
+    "calculator",
+    "peg",
+    "date-util"
+  ],
+  "author": "Jannes Mingram (Jannes@Mingram.net)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Zyclotrop-j/DateCalculator/issues"
+  },
+  "homepage": "https://github.com/Zyclotrop-j/DateCalculator#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.4",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-preset-env": "^1.6.1",
+    "codegen.macro": "^3.0.0",
+    "date-fns": "^2.0.1",
+    "eslint": "^3.9.1",
+    "eslint-loader": "^1.6.1",
+    "lodash": "^4.16.6",
+    "luxon": "^1.17.2",
+    "pegjs": "^0.10.0",
+    "preval.macro": "^3.0.0",
+    "webpack": "^4.4.1",
+    "webpack-cli": "^3.3.7"
+  }
+}

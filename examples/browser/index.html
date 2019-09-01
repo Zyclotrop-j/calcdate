@@ -1,0 +1,23 @@
+<html>
+  <head>
+    <title>Demo for datecalculator</title>
+    <script
+      src="https://cdn.jsdelivr.net/npm/luxon@1.17.2/build/global/luxon.min.js"
+      integrity="sha256-TOF3PCK8pfM4niwt3bhsF+++JWfzMgu3NyX8FUB+xJs="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/date-fns@2.0.1/index.min.js"
+      integrity="sha384-BZ30sQDgRb6FKJ+682ulIf0NL/Te2HIdYHHhcxwILx7/r+AhOLiUfbRtz8mEN9Vb"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/javascript" src="./datecalculator.js"></script>
+    <script type="text/javascript">
+      document.getElementById("root").innerHTML =
+        "This is a demo" + datecalculator`now + 5`;
+    </script>
+  </body>
+</html>

@@ -1,0 +1,252 @@
+// Date Calculation Grammar
+// ==========================
+//
+// Accepts expressions like "now + 2 * (3 days + 4min)" and computes their value.
+
+Expression
+  = L1OP
+
+L1OP
+  = head:Term tail:(_ ("+" / "-") _ Term)* {
+      return tail.reduce(function(result, element) {
+        if (element[1] === "+") { return options.plus(result, element[3]); }
+        if (element[1] === "-") { return options.minus(result, element[3]) }
+      }, head);
+    }
+
+Term
+  = head:Factor tail:(_ ("*" / "/") _ Factor)* {
+      return tail.reduce(function(result, element) {
+        if (element[1] === "*") { return options.multiply(result, element[3]); }
+        if (element[1] === "/") { return options.divide(result, element[3]); }
+      }, head);
+    }
+
+Factor
+  = "(" _ expr:Expression _ ")" { return expr; }
+  / Unit
+
+Unit
+  = DateExpr / InterpoltionExpr / Float / Now /
+   Duration / Date / DateTimeWithSec / DateWithTime / CompleteDate / Datemonth / Dateyear /
+  Year / Shortyear / Shortmillisecond / Millisecond / Fortnight /
+  Month / Minute / Shortminutes / Shorterminutes / Shortmonth / Hour / Shortfortnight /
+  Shorthour / Day / Shortday / Week / Shortweekday / Weekday /
+  Second / Shortsecond / Quarter / Shortquarter / Shortweek /
+  Unitless / Integer
+
+Duration "duration"
+  =  OPM "P" years:OptYearDur months:OptMonthDur weeks:OptWeekDur days:OptDayDur
+  time:(("T" hours:OptHourDur minutes:OptMinuteDur seconds:OptSecondDur {
+  	return { hours, minutes, seconds };
+  }) / "" { return {} }) {
+  	return options.makeDuration(Object.assign({}, time, {
+    	years,
+      months,
+      weeks,
+      days,
+    }), { type: DURATIONOBJECT });
+  }
+
+OptHourDur
+ = (OPM [0-9,.]* "H") { return parseFloat(text()) } / "" { return 0; }
+
+OptMinuteDur
+= (OPM [0-9,.]* "M") { return parseFloat(text()) } / "" { return 0; }
+
+OptSecondDur
+ = (OPM [0-9,.]* "S") { return parseFloat(text()) } / "" { return 0; }
+
+OptYearDur
+ = (OPM [0-9,.]* "Y") { return parseFloat(text()) } / "" { return 0; }
+
+ OptMonthDur
+  = (OPM [0-9,.]* "M") { return parseFloat(text()) } / "" { return 0; }
+
+OptWeekDur
+ = (OPM [0-9,.]* "W") { return parseFloat(text()) } / "" { return 0; }
+
+ OptDayDur
+  = (OPM [0-9,.]* "D") { return parseFloat(text()) } / "" { return 0; }
+
+OPM "optionalplusminus"
+  = ("+" / "-" / "")
+
+Now "now"
+  = ("now"i / "today"i / "now()"i / "today()"i) { return options.makeDate(new Date(), { type: NATIVEDATE }); }
+
+InterpoltionExpr "interpoltion"
+  = "%" inter:[^%]+ "%" { return options.interpolation(inter.join("")) }
+
+DateExpr "dateExpression"
+  = "{" date:[^}]+ "}" { return options.makeDate(date.join(""), { type: DATEXPRESION }) }
+
+DurationExpr "durationExpression"
+  = "[" duration:[^\]]+ "]" { return options.makeDuration(duration.join(""), { type: DURATIONEXPRESSION }) }
+
+Dateyear "dateyear"
+  = (("19" [7-9] [0-9]) / ([2-9] [0-9] [0-9] [0-9]))
+  { return options.makeDate(new Date(parseInt(text(), 10)), { type: NATIVEDATE }); }
+
+Datemonth "datemonth"
+  = year:Int "-" month:MonthExpression
+  { return options.makeDate(new Date(
+  	parseInt(year.join(""), 10),
+    parseInt(month.join(""), 10) - 1
+  ), { type: NATIVEDATE }); }
+
+CompleteDate "completedate"
+  = year:Int "-" month:MonthExpression "-" day:DayExpression
+  { return options.makeDate(new Date(
+  	parseInt(year.join(""), 10),
+    parseInt(month.join(""), 10) - 1,
+    parseInt(day.join(""), 10)
+  ), { type: NATIVEDATE }); }
+
+DateWithTime "datetime"
+  = (year:Int "-" month:MonthExpression "-" day:DayExpression
+  	"T" hours:HourExpression ":" minutes:MinuteExpression
+    timezone:Timezone / year:Int "-" month:MonthExpression "-" day:DayExpression
+  	"T" hours:HourExpression ":" minutes:MinuteExpression)
+  { return options.makeDate(new Date(text()), { type: NATIVEDATE }); }
+
+DateTimeWithSec "datetimesec"
+  = (year:Int "-" month:MonthExpression "-" day:DayExpression
+  	"T" hours:HourExpression ":" minutes:MinuteExpression ":"
+    seconds:SecondExpression
+    timezone:Timezone / year:Int "-" month:MonthExpression "-" day:DayExpression
+  	"T" hours:HourExpression ":" minutes:MinuteExpression ":"
+    seconds:SecondExpression)
+  { return options.makeDate(new Date(text()), { type: NATIVEDATE }); }
+
+Date "date"
+  = year:Int "-" month:MonthExpression "-" day:DayExpression
+  	"T" hours:HourExpression ":" minutes:MinuteExpression ":"
+    seconds:SecondExpression "." milliseconds:MillisecondExpression
+    timezone:Timezone
+  { return options.makeDate(new Date(
+  	parseInt(year.join(""), 10),
+    parseInt(month.join(""), 10) - 1,
+    parseInt(day.join(""), 10),
+    parseInt(hours.join(""), 10),
+    parseInt(minutes.join(""), 10),
+    parseInt(seconds.join(""), 10),
+    parseInt(milliseconds.join(""), 10)
+  ), { type: NATIVEDATE }); }
+
+MonthExpression "month"
+  = "12" / "11" / "10" / "0" [1-9] / [1-9]
+
+DayExpression "day"
+  = "31" / "30" / "2" [0-9] / "1" [0-9] / "0" [1-9] / [1-9]
+
+HourExpression "hour"
+  = "2" [0-3] / "1" [0-9] / "0" [0-9] / [0-9]
+
+MinuteExpression "minute"
+  = [0-5] [0-9] / [0-9]
+
+SecondExpression "second"
+  = [0-5] [0-9] / [0-9]
+
+MillisecondExpression "millisecond"
+  = [0-9] [0-9] [0-9] / [0-9] [0-9] / [0-9]
+
+Timezone "tiezone"
+  = "Z" / PlusOrMinues [0-9][0-9] ":" [0-9][0-9]
+
+PlusOrMinues "plusorminus"
+  = "+" / "-"
+
+Quarter "quarter"
+  = Number _ "quarter"i "s"? { return options.makeDuration({ quarters: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+Shortquarter "shortquarter"
+  = Number _ "quarter"i "s"? { return options.makeDuration({ quarters: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+Weekday "weekday"
+  = Number _ "weekday"i "s"? { return options.makeDuration({ weekdays: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+Shortweekday "shortweekday"
+  = Number _ "wd" "s"? { return options.makeDuration({ weekdays: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+Year "year"
+  = Number _ "year"i "s"? { return options.makeDuration({ years: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+Shortyear "shortyear"
+  = Number _ "a" "s"? { return options.makeDuration({ years: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+Shortmillisecond "ms"
+  = Number _ "ms" "s"? { return options.makeDuration({ milliseconds: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+Millisecond "millisecond"
+  = Number _ "millisecond"i "s"? { return options.makeDuration({ milliseconds: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+Month "month"
+  = Number _ "month"i "s"? { return options.makeDuration({ months: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+Shortmonth "Shortmonth"
+  = Number _ "m" "s"? { return options.makeDuration({ months: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+Minute "minute"
+  = Number _ "minute"i "s"? { return options.makeDuration({ minutes: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+Shortminutes "shortminutes"
+  = Number _ "min"i "s"? { return options.makeDuration({ minutes: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+Shorterminutes "shorterminutes"
+  = Number _ "mm" "s"? { return options.makeDuration({ minutes: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+Hour "hour"
+  = Number _ "hour"i "s"? { return options.makeDuration({ hours: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+Shorthour "shorthour"
+  = Number _ "h" "s"? { return options.makeDuration({ hours: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+Day "day"
+  = Number _ "day"i "s"? { return options.makeDuration({ days: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+Shortday "shortday"
+  = Number _ "d" "s"? { return options.makeDuration({ days: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+Week "week"
+  = Number _ "week"i "s"? { return options.makeDuration({ weeks: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+Fortnight "fortnight"
+  = Number _ "fortnight"i "s"? { return options.makeDuration({ weeks: parseFloat(text(), 10) * 2 }, { type: DURATIONOBJECT }); }
+
+Shortfortnight "Shortfortnight"
+  = Number _ "fn" "s"? { return options.makeDuration({ weeks: parseFloat(text(), 10) * 2 }, { type: DURATIONOBJECT }); }
+
+Shortweek "shortweek"
+  = Number _ "w" "s"? { return options.makeDuration({ weeks: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+Second "second"
+  = Number _ "second"i "s"? { return options.makeDuration({ seconds: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+Shortsecond "s"
+  = Number _ "s" "s"? { return options.makeDuration({ seconds: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+Unitless "u"
+  = Number _ "u" "s"? { return { unitless: parseFloat(text(), 10) }; }
+
+Number "number"
+  = Float / Integer
+
+Integer "integer"
+  = _ [0-9]+ { return { unitless: parseInt(text(), 10) }; }
+
+Int "int"
+  = [0-9]+
+
+Float "float"
+  = _ [0-9]+Dot[0-9]+ { return { unitless: parseFloat(text(), 10) }; }
+
+Dot "dot"
+  = "."
+
+Minus "minus"
+  = "−" / "-"
+
+_ "whitespace"
+  = [ \t\n\r]*
