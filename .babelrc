@@ -1,9 +1,4 @@
 {
-  "presets": [
-    "env"
-  ],
-  "plugins": [
-    "add-module-exports",
-    "macros"
-  ]
+  "presets": ["@babel/preset-env"],
+  "plugins": ["add-module-exports", "macros"]
 }

@@ -1,6 +1,6 @@
 const path = require("path");
 
-export default () => ({
+module.exports = {
   mode: "production",
   entry: "./index.js",
   output: {
@@ -34,4 +34,4 @@ export default () => ({
       }
     ]
   }
-});
+};
