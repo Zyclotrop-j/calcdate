@@ -6,10 +6,46 @@ const isUnitless = a => {
 };
 
 export const luxon = (
-  { NATIVEDATE, DATEXPRESION, DURATIONEXPRESSION, DURATIONOBJECT },
+  {
+    NATIVEDATE,
+    DATEXPRESION,
+    DURATIONEXPRESSION,
+    DURATIONOBJECT,
+    INTERVALEXPRESION,
+    INTERVALOBJECT
+  },
   { console }
 ) => {
   return {
+    makeInterval: (interval, { type }) => {
+      return {
+        [INTERVALEXPRESION]: text => {
+          return Interval.fromISO(text);
+        },
+        [INTERVALOBJECT]: ([from, to]) => {
+          if (DateTime.isDateTime(from) && DateTime.isDateTime(from)) {
+            return Interval.fromDateTimes(from, to);
+          }
+          if (DateTime.isDateTime(from) && Duration.isDuration(to)) {
+            return Interval.after(from, to);
+          }
+          if (DateTime.isDateTime(to) && Duration.isDuration(from)) {
+            return Interval.before(from, to);
+          }
+          const e = `Invalid arguments for 'makeInterval', expected (date, duration), (duration, date), (date, date) but found (${
+            from.invalidExplanation
+              ? `Invalid date ${from.invalidExplanation}`
+              : typeof from
+          }, ${
+            to.invalidExplanation
+              ? `Invalid date ${to.invalidExplanation}`
+              : typeof to
+          })`;
+          console.error(e, from, to);
+          throw new Error(e);
+        }
+      }[type](interval);
+    },
     makeDuration: (duration, { type }) => {
       return {
         [DURATIONEXPRESSION]: a => {
@@ -68,7 +104,7 @@ export const luxon = (
         [NATIVEDATE]: DateTime.fromJSDate
       }[type](date);
     },
-    plus: (a, b) => {
+    add: (a, b) => {
       if (isUnitless(a) && isUnitless(b)) {
         return { unitless: a.unitless + b.unitless };
       }
@@ -76,10 +112,10 @@ export const luxon = (
         return a.union(b);
       }
       if (Interval.isInterval(a) && Duration.isDuration(b)) {
-        return Interval.fromDateTimes(a.start.plus(b), a.end.plus(b));
+        return Interval.fromDateTimes(a.start.add(b), a.end.add(b));
       }
       if (Interval.isInterval(b) && Duration.isDuration(a)) {
-        return Interval.fromDateTimes(b.start.plus(a), b.end.plus(a));
+        return Interval.fromDateTimes(b.start.add(a), b.end.add(a));
       }
       if (Interval.isInterval(a) && DateTime.isDateTime(b)) {
         if (a.isAfter(b)) {
@@ -91,26 +127,26 @@ export const luxon = (
         return b;
       }
       if (Interval.isInterval(b) && DateTime.isDateTime(a)) {
-        return a.plus(b.toDuration());
+        return a.add(b.toDuration());
       }
       if (Interval.isInterval(b) && DateTime.isDateTime(a)) {
-        return Interval.fromDateTimes(b.start.minus(a), b.end.minus(a));
+        return Interval.fromDateTimes(b.start.substract(a), b.end.substract(a));
       }
       if (Duration.isDuration(a) && Duration.isDuration(b)) {
-        return a.plus(b);
+        return a.add(b);
       }
       if (DateTime.isDateTime(a) && DateTime.isDateTime(b)) {
         throw new Error("Can't add dates to each other!");
       }
       if (DateTime.isDateTime(a) && a.isValid && Duration.isDuration(b)) {
         // b is duratoin
-        return a.plus(b);
+        return a.add(b);
       }
       if (DateTime.isDateTime(b) && b.isValid && Duration.isDuration(a)) {
         // a is duratoin
-        return b.plus(a);
+        return b.add(a);
       }
-      const e = `Invalid arguments for 'plus', expected (date, duration), (duration, date), (duration, duration) but found (${
+      const e = `Invalid arguments for 'add', expected (date, duration), (duration, date), (duration, duration) but found (${
         a.invalidExplanation ? `Invalid date ${a.invalidExplanation}` : typeof a
       }, ${
         b.invalidExplanation ? `Invalid date ${b.invalidExplanation}` : typeof b
@@ -118,7 +154,7 @@ export const luxon = (
       console.error(e, a, b);
       throw new Error(e);
     },
-    minus: (a, b) => {
+    substract: (a, b) => {
       if (isUnitless(a) && isUnitless(b)) {
         return { unitless: a.unitless - b.unitless };
       }
@@ -131,13 +167,13 @@ export const luxon = (
         );
       }
       if (Interval.isInterval(a) && Duration.isDuration(b)) {
-        return Interval.fromDateTimes(a.start.minus(b), a.end.minus(b));
+        return Interval.fromDateTimes(a.start.substract(b), a.end.substract(b));
       }
       if (Interval.isInterval(b) && Duration.isDuration(a)) {
-        return Interval.fromDateTimes(b.start.minus(a), b.end.minus(a));
+        return Interval.fromDateTimes(b.start.substract(a), b.end.substract(a));
       }
       if (Duration.isDuration(a) && Duration.isDuration(b)) {
-        return a.minus(b);
+        return a.substract(b);
       }
       if (Interval.isInterval(a) && DateTime.isDateTime(b)) {
         if (a.isBefore(b)) {
@@ -149,7 +185,7 @@ export const luxon = (
         return Interval.fromDateTimes(a.start, b);
       }
       if (Interval.isInterval(b) && DateTime.isDateTime(a)) {
-        return a.minus(b.toDuration());
+        return a.substract(b.toDuration());
       }
       if (
         DateTime.isDateTime(a) &&
@@ -161,13 +197,13 @@ export const luxon = (
       }
       if (DateTime.isDateTime(a) && a.isValid && Duration.isDuration(b)) {
         // b is duratoin
-        return a.minus(b);
+        return a.substract(b);
       }
       if (DateTime.isDateTime(b) && b.isValid && Duration.isDuration(a)) {
         // a is duratoin
-        return b.minus(a);
+        return b.substract(a);
       }
-      const e = `Invalid arguments for 'minus', expected (date, duration), (duration, date), (duration, duration) but found (${
+      const e = `Invalid arguments for 'substract', expected (date, duration), (duration, date), (duration, duration) but found (${
         a.invalidExplanation ? `Invalid date ${a.invalidExplanation}` : typeof a
       }, ${
         b.invalidExplanation ? `Invalid date ${b.invalidExplanation}` : typeof b

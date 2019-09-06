@@ -150,7 +150,7 @@ export const datefns = (
         [NATIVEDATE]: d => d
       }[type](date);
     },
-    plus: (a, b) => {
+    add: (a, b) => {
       if (isUnitless(a) && isUnitless(b)) {
         return { unitless: a.unitless + b.unitless };
       }
@@ -180,13 +180,13 @@ export const datefns = (
           b
         );
       }
-      const e = `Invalid arguments for 'plus', expected (date, duration), (duration, date), (duration, duration) but found (${getType(
+      const e = `Invalid arguments for 'add', expected (date, duration), (duration, date), (duration, duration) but found (${getType(
         a
       )}, ${getType(b)})`;
       console.error(e, a, b);
       throw new Error(e);
     },
-    minus: (a, b) => {
+    substract: (a, b) => {
       if (isUnitless(a) && isUnitless(b)) {
         return { unitless: a.unitless - b.unitless };
       }
@@ -221,7 +221,7 @@ export const datefns = (
           b
         );
       }
-      const e = `Invalid arguments for 'minus', expected (date, duration), (duration, date), (duration, duration) but found (${getType(
+      const e = `Invalid arguments for 'substract', expected (date, duration), (duration, date), (duration, duration) but found (${getType(
         a
       )}, ${getType(b)})`;
       console.error(e, a, b);

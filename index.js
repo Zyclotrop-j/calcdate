@@ -2,6 +2,8 @@ import parser from "./dateCalculator";
 import { simple } from "./bindings/simple";
 import { datefns } from "./bindings/date-fns";
 import { luxon } from "./bindings/luxon";
+import { simpleluxon } from "./bindings/simpleluxon";
+import { moment } from "./bindings/moment";
 
 const customConsole = {
   log: console.log.bind(console),
@@ -22,6 +24,16 @@ export const datefnsCalculator = parser(
 );
 export const luxonCalculator = parser(
   luxon(parser, {
+    console: customConsole
+  })
+);
+export const simpleluxonCalculator = parser(
+  simpleluxon(parser, {
+    console: customConsole
+  })
+);
+export const momentCalculator = parser(
+  moment(parser, {
     console: customConsole
   })
 );

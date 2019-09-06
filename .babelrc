@@ -1,4 +1,9 @@
 {
   "presets": ["@babel/preset-env"],
-  "plugins": ["add-module-exports", "macros"]
+  "plugins": ["add-module-exports", "macros"],
+  "env": {
+    "test": {
+      "plugins": ["dynamic-import-node", "transform-es2015-modules-commonjs"]
+    }
+  }
 }

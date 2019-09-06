@@ -2,7 +2,9 @@ export const simple = ({
   NATIVEDATE,
   DATEXPRESION,
   DURATIONEXPRESSION,
-  DURATIONOBJECT
+  DURATIONOBJECT,
+  INTERVALEXPRESION,
+  INTERVALOBJECT
 }) => {
   const tostring = {
     configurable: false,
@@ -45,7 +47,7 @@ export const simple = ({
   function isValidDate(date) {
     return date instanceof Date && !isNaN(date.valueOf());
   }
-  const plusMap = {
+  const addMap = {
     date: () => {
       throw new Error("Cannot merge two dates");
     },
@@ -61,7 +63,7 @@ export const simple = ({
     quarters: (d, a) => d - (-a * 1000 * 60 * 60 * 24 * 7 * 52) / 4,
     years: (d, a) => d - -a * 1000 * 60 * 60 * 24 * 7 * 52
   };
-  const minusMap = {
+  const substractMap = {
     date: (a, b) => ({ milliseconds: a.getTime() - b.getTime() }),
     unitless: (d, a) => d - a * 1,
     milliseconds: (d, a) => d - a * 1,
@@ -139,11 +141,27 @@ export const simple = ({
         [NATIVEDATE]: ident
       }[type](date);
     },
-    plus: (a, b) => {
-      return mergeOp(a, b, (a, b) => a + b, plusMap);
+    makeInterval: (interval, { type }) => {
+      return {
+        [INTERVALEXPRESION]: text => {
+          const tryDurationElseDate = i => {
+            try {
+              return makeDuration(i);
+            } catch (e) {
+              return makeDate(i);
+            }
+          };
+          const [from, to] = text.split("/");
+          return [tryDurationElseDate(from), tryDurationElseDate(to)];
+        },
+        [INTERVALOBJECT]: ident
+      }[type](interval);
     },
-    minus: (a, b) => {
-      return mergeOp(a, b, (a, b) => a - b, minusMap);
+    add: (a, b) => {
+      return mergeOp(a, b, (a, b) => a + b, addMap);
+    },
+    substract: (a, b) => {
+      return mergeOp(a, b, (a, b) => a - b, substractMap);
     },
     multiply: (a, b) => {
       return scalarMultiply(a, b);

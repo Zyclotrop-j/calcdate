@@ -23,6 +23,12 @@ module.exports = {
       commonjs2: "date-fns",
       amd: "date-fns",
       root: "datefns"
+    },
+    moment: {
+      commonjs: "moment",
+      commonjs2: "moment",
+      amd: "moment",
+      root: "moment"
     }
   },
   module: {

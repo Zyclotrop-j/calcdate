@@ -3,14 +3,20 @@
 //
 // Accepts expressions like "now + 2 * (3 days + 4min)" and computes their value.
 
+{
+  function getDate(str, ...args) {
+    return new Date(str, ...args);
+  }
+}
+
 Expression
-  = L1OP
+  = _ t:L1OP _ { return t; }
 
 L1OP
   = head:Term tail:(_ ("+" / "-") _ Term)* {
       return tail.reduce(function(result, element) {
-        if (element[1] === "+") { return options.plus(result, element[3]); }
-        if (element[1] === "-") { return options.minus(result, element[3]) }
+        if (element[1] === "+") { return options.add(result, element[3]); }
+        if (element[1] === "-") { return options.substract(result, element[3]) }
       }, head);
     }
 
@@ -26,14 +32,34 @@ Factor
   = "(" _ expr:Expression _ ")" { return expr; }
   / Unit
 
-Unit
-  = DateExpr / InterpoltionExpr / Float / Now /
-   Duration / Date / DateTimeWithSec / DateWithTime / CompleteDate / Datemonth / Dateyear /
-  Year / Shortyear / Shortmillisecond / Millisecond / Fortnight /
-  Month / Minute / Shortminutes / Shorterminutes / Shortmonth / Hour / Shortfortnight /
-  Shorthour / Day / Shortday / Week / Shortweekday / Weekday /
-  Second / Shortsecond / Quarter / Shortquarter / Shortweek /
-  Unitless / Integer
+  Unit
+    = IntervalExpression / DateExpr / InterpoltionExpr / Float / Now /
+     Interval / Duration /
+    Year / Shortyear / Shortyeary / Shortmillisecond / Millisecond / Fortnight /
+    Month / Minute / ShortminutesAlt / Shortminutes / Shorterminutes / Shortmonth / Shortmonthalt / Hour / Shortfortnight /
+    Shorthour / Day / Weekday / Shortday / Week / Shortweekday /
+    Second / ShortsecondAlt / Shortsecond / Quarter / Shortquarter / Shortweek /
+    Unitless / ProperIsoDate / Date / DateTimeWithSec / DateWithTime / CompleteDate / Datemonth / Dateyear / Integer
+
+IntervalExpression "intervalexpression"
+  =   "~" interval:[^~]+ "~" { return options.makeInterval(interval.join(""), { type: INTERVALEXPRESION }) }
+
+Interval "interval"
+  = from:AnyDate "/" to:AnyDate { return options.makeInterval([from, to], {
+    type: INTERVALOBJECT,
+    raw: text()
+  }); } /
+  from:AnyDate "/" to:Duration { return options.makeInterval([from, to], {
+    type: INTERVALOBJECT,
+    raw: text()
+  }); } /
+  from:Duration "/" to:AnyDate { return options.makeInterval([from, to], {
+    type: INTERVALOBJECT,
+    raw: text()
+  }); }
+
+AnyDate
+  =  ProperIsoDate / Date / DateTimeWithSec / DateWithTime / CompleteDate / Datemonth / Dateyear
 
 Duration "duration"
   =  OPM "P" years:OptYearDur months:OptMonthDur weeks:OptWeekDur days:OptDayDur
@@ -73,7 +99,7 @@ OPM "optionalplusminus"
   = ("+" / "-" / "")
 
 Now "now"
-  = ("now"i / "today"i / "now()"i / "today()"i) { return options.makeDate(new Date(), { type: NATIVEDATE }); }
+  = ("now"i / "today"i / "now()"i / "today()"i) { return options.makeDate(getDate(), { type: NATIVEDATE, parser: "now" }); }
 
 InterpoltionExpr "interpoltion"
   = "%" inter:[^%]+ "%" { return options.interpolation(inter.join("")) }
@@ -86,29 +112,131 @@ DurationExpr "durationExpression"
 
 Dateyear "dateyear"
   = (("19" [7-9] [0-9]) / ([2-9] [0-9] [0-9] [0-9]))
-  { return options.makeDate(new Date(parseInt(text(), 10)), { type: NATIVEDATE }); }
+  { return options.makeDate(getDate(parseInt(text(), 10)), { type: NATIVEDATE, parser: "dateyear" }); }
 
 Datemonth "datemonth"
   = year:Int "-" month:MonthExpression
-  { return options.makeDate(new Date(
+  { return options.makeDate(getDate(
   	parseInt(year.join(""), 10),
     parseInt(month.join(""), 10) - 1
-  ), { type: NATIVEDATE }); }
+  ), { type: NATIVEDATE, parser: "datemonth" }); }
 
 CompleteDate "completedate"
   = year:Int "-" month:MonthExpression "-" day:DayExpression
-  { return options.makeDate(new Date(
+  { return options.makeDate(getDate(
   	parseInt(year.join(""), 10),
     parseInt(month.join(""), 10) - 1,
     parseInt(day.join(""), 10)
-  ), { type: NATIVEDATE }); }
+  ), { type: NATIVEDATE, parser: "completedate" }); }
+
+ProperIsoDate "properiso"
+  = v:IsoLeapSeconds { return options.makeDate(v); }  /
+    date:ValidIsoDate time:ProperIsoTime
+  { return options.makeDate(getDate(`${date.year}-${date.month}-${date.day}T${time[0].hours}:${time[0].minutes}:${time[0].seconds}${time[1]}`), { type: NATIVEDATE, parser: "properiso" }); }
+
+OrdinalIsoDate
+  = year:IsoYear "-"? days:(
+    [0-2] [0-9] [1-9] /
+    [0-2] [1-9] "0" /
+    [1-2] [0-9] "0" /
+    "3" [0-5] [0-6]
+  ) { return { year, days: days.join("") }; }
+
+ProperIsoTime
+ = (
+ time:(IsoTimeSeperator
+ hours:("2" [0-3] / "1" [0-9] / "0" [0-9])
+   ms:(":"? minutes:([0-5][0-9])
+     seconds:(":"? seconds:([0-5][0-9]) { return seconds.join(""); })?
+   { return { minutes: (minutes.join("")), seconds: seconds || "00"}; }
+     )? { return Object.assign({ hours: (hours.join("")), minutes: "00", seconds: "00" }, ms || {}); }
+ )?
+ timezone:(Timezone { return text(); })? { return [time || { hours: "00", minutes: "00", seconds: "00" }, timezone || ""]; })
+
+IsoTimezone
+  = "Z"i / PlusOrMinues [0-9][0-9] ":"? [0-9][0-9]
+
+IsoTimeSeperator = "T"i / " "
+
+ValidIsoDate =
+  year:IsoYear "-"? month:IsoLongMonth "-"? day:DaysLong { return { year, month, day }; } /
+  year:IsoYear "-"? month:IsoShortMonth "-"? day:DaysShort { return { year, month, day }; } /
+  year:IsoStdYear "-"? month:"02" "-"? day:([0-1] [0-9] / "2" [0-8]) { return { year, month: "02", day: day.join("") }; } /
+  year:IsoLeapYear "-"? month:"02" "-"? day:([0-1] [0-9] / "2" [0-9]) { return { year, month: "02", day: day.join("") }; } /
+  o:OrdinalIsoDate { const tmp = getDate(parseInt(o.year, 10), 0); tmp.setDate(tmp.getDate() + parseInt(o.days, 10)); return { year: o.year, month: `${tmp.getMonth() + 1}`.padStart(2, "0"), day: `${tmp.getDate()}`.padStart(2, "0") }; } /
+  year:IsoYear "-"? month:("0" [1-9] / "1" [0-2]) { return { year, month: month.join(""), day: "01" } } /
+  year:IsoYear { return { year, month: "01", day: "01" }; }
+
+DaysShort = [0-2] [0-9] { return (text()); } / "30" { return 30; }
+
+DaysLong = [0-2] [0-9] { return (text()); } / "30" { return 30; } / "31" { return 31; }
+
+IsoLongMonth = ("01" / "03" / "05" / "08" / "10" / "12") { return (text()); }
+
+IsoShortMonth = ("04" / "06" / "09" / "11"){ return (text()); }
+
+IsoLeapSeconds =
+  ("1972" "-"? "06" "-"? "30" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "1972" "-"? "12" "-"? "31" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "1973" "-"? "12" "-"? "31" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "1974" "-"? "12" "-"? "31" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "1975" "-"? "12" "-"? "31" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "1976" "-"? "12" "-"? "31" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "1977" "-"? "12" "-"? "31" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "1978" "-"? "12" "-"? "31" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "1979" "-"? "12" "-"? "31" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "1981" "-"? "06" "-"? "30" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "1982" "-"? "06" "-"? "30" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "1983" "-"? "06" "-"? "30" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "1985" "-"? "06" "-"? "30" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "1987" "-"? "12" "-"? "31" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "1989" "-"? "12" "-"? "31" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "1990" "-"? "12" "-"? "31" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "1992" "-"? "06" "-"? "30" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "1993" "-"? "06" "-"? "30" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "1994" "-"? "06" "-"? "30" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "1995" "-"? "12" "-"? "31" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "1997" "-"? "06" "-"? "30" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "1998" "-"? "12" "-"? "31" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "2005" "-"? "12" "-"? "31" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "2008" "-"? "12" "-"? "31" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "2012" "-"? "06" "-"? "30" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "2015" "-"? "06" "-"? "30" "T"? "23" ":"? "59" ":"? "60" "Z" /
+  "2016" "-"? "12" "-"? "31" "T"? "23" ":"? "59" ":"? "60" "Z")
+    { const d = getDate(`${text().slice(0, -3)}59Z`); d.leapSecond = true; return d; }
+
+IsoLeapYear =
+  ([0-9] [0-9] ("0" / "2" / "4" / "6" / "8") ("4" / "8") /
+  [0-9] [0-9] ("1" / "3" / "5" / "7" / "9") ("2" / "6") /
+  "0000" / "0020" / "0040" / "0052" / "0056" / "0060" / "0080" / "0120" / "0140" / "0152" / "0156" / "0160" / "0180" / "0220" / "0240" / "0252" / "0256" / "0260" / "0280" / "0320" / "0340" / "0352" / "0356" / "0360" / "0380" / "0400" / "0420" / "0440" / "0452" / "0456" / "0460" / "0480" / "0520" / "0540" / "0552" / "0556" / "0560" / "0580" / "0620" / "0640" / "0652" / "0656" / "0660" / "0680" / "0720" / "0740" / "0752" / "0756" / "0760" / "0780" / "0800" / "0820" / "0840" / "0852" / "0856" / "0860" / "0880" / "0920" / "0940" / "0952" / "0956" / "0960" / "0980" / "1020" / "1040" / "1052" / "1056" / "1060" / "1080" / "1120" / "1140" / "1152" / "1156" / "1160" / "1180" / "1200" / "1220" / "1240" / "1252" / "1256" / "1260" / "1280" / "1320" / "1340" / "1352" / "1356" / "1360" / "1380" / "1420" / "1440" / "1452" / "1456" / "1460" / "1480" / "1520" / "1540" / "1552" / "1556" / "1560" / "1580" / "1600" / "1620" / "1640" / "1652" / "1656" / "1660" / "1680" / "1720" / "1740" / "1752" / "1756" / "1760" / "1780" / "1820" / "1840" / "1852" / "1856" / "1860" / "1880" / "1920" / "1940" / "1952" / "1956" / "1960" / "1980" / "2000" / "2020" / "2040" / "2052" / "2056" / "2060" / "2080" / "2120" / "2140" / "2152" / "2156" / "2160" / "2180" / "2220" / "2240" / "2252" / "2256" / "2260" / "2280" / "2320" / "2340" / "2352" / "2356" / "2360" / "2380" / "2400" / "2420" / "2440" / "2452" / "2456" / "2460" / "2480" / "2520" / "2540" / "2552" / "2556" / "2560" / "2580" / "2620" / "2640" / "2652" / "2656" / "2660" / "2680" / "2720" / "2740" / "2752" / "2756" / "2760" / "2780" / "2800" / "2820" / "2840" / "2852" / "2856" / "2860" / "2880" / "2920" / "2940" / "2952" / "2956" / "2960" / "2980" / "3020" / "3040" / "3052" / "3056" / "3060" / "3080" / "3120" / "3140" / "3152" / "3156" / "3160" / "3180" / "3200" / "3220" / "3240" / "3252" / "3256" / "3260" / "3280" / "3320" / "3340" / "3352" / "3356" / "3360" / "3380" / "3420" / "3440" / "3452" / "3456" / "3460" / "3480" / "3520" / "3540" / "3552" / "3556" / "3560" / "3580" / "3600" / "3620" / "3640" / "3652" / "3656" / "3660" / "3680" / "3720" / "3740" / "3752" / "3756" / "3760" / "3780" / "3820" / "3840" / "3852" / "3856" / "3860" / "3880" / "3920" / "3940" / "3952" / "3956" / "3960" / "3980" / "4000" / "4020" / "4040" / "4052" / "4056" / "4060" / "4080" / "4120" / "4140" / "4152" / "4156" / "4160" / "4180" / "4220" / "4240" / "4252" / "4256" / "4260" / "4280" / "4320" / "4340" / "4352" / "4356" / "4360" / "4380" / "4400" / "4420" / "4440" / "4452" / "4456" / "4460" / "4480" / "4520" / "4540" / "4552" / "4556" / "4560" / "4580" / "4620" / "4640" / "4652" / "4656" / "4660" / "4680" / "4720" / "4740" / "4752" / "4756" / "4760" / "4780" / "4800" / "4820" / "4840" / "4852" / "4856" / "4860" / "4880" / "4920" / "4940" / "4952" / "4956" / "4960" / "4980" / "5020" / "5040" / "5052" / "5056" / "5060" / "5080" / "5120" / "5140" / "5152" / "5156" / "5160" / "5180" / "5200" / "5220" / "5240" / "5252" / "5256" / "5260" / "5280" / "5320" / "5340" / "5352" / "5356" / "5360" / "5380" / "5420" / "5440" / "5452" / "5456" / "5460" / "5480" / "5520" / "5540" / "5552" / "5556" / "5560" / "5580" / "5600" / "5620" / "5640" / "5652" / "5656" / "5660" / "5680" / "5720" / "5740" / "5752" / "5756" / "5760" / "5780" / "5820" / "5840" / "5852" / "5856" / "5860" / "5880" / "5920" / "5940" / "5952" / "5956" / "5960" / "5980" / "6000" / "6020" / "6040" / "6052" / "6056" / "6060" / "6080" / "6120" / "6140" / "6152" / "6156" / "6160" / "6180" / "6220" / "6240" / "6252" / "6256" / "6260" / "6280" / "6320" / "6340" / "6352" / "6356" / "6360" / "6380" / "6400" / "6420" / "6440" / "6452" / "6456" / "6460" / "6480" / "6520" / "6540" / "6552" / "6556" / "6560" / "6580" / "6620" / "6640" / "6652" / "6656" / "6660" / "6680" / "6720" / "6740" / "6752" / "6756" / "6760" / "6780" / "6800" / "6820" / "6840" / "6852" / "6856" / "6860" / "6880" / "6920" / "6940" / "6952" / "6956" / "6960" / "6980" / "7020" / "7040" / "7052" / "7056" / "7060" / "7080" / "7120" / "7140" / "7152" / "7156" / "7160" / "7180" / "7200" / "7220" / "7240" / "7252" / "7256" / "7260" / "7280" / "7320" / "7340" / "7352" / "7356" / "7360" / "7380" / "7420" / "7440" / "7452" / "7456" / "7460" / "7480" / "7520" / "7540" / "7552" / "7556" / "7560" / "7580" / "7600" / "7620" / "7640" / "7652" / "7656" / "7660" / "7680" / "7720" / "7740" / "7752" / "7756" / "7760" / "7780" / "7820" / "7840" / "7852" / "7856" / "7860" / "7880" / "7920" / "7940" / "7952" / "7956" / "7960" / "7980" / "8000" / "8020" / "8040" / "8052" / "8056" / "8060" / "8080" / "8120" / "8140" / "8152" / "8156" / "8160" / "8180" / "8220" / "8240" / "8252" / "8256" / "8260" / "8280" / "8320" / "8340" / "8352" / "8356" / "8360" / "8380" / "8400" / "8420" / "8440" / "8452" / "8456" / "8460" / "8480" / "8520" / "8540" / "8552" / "8556" / "8560" / "8580" / "8620" / "8640" / "8652" / "8656" / "8660" / "8680" / "8720" / "8740" / "8752" / "8756" / "8760" / "8780" / "8800" / "8820" / "8840" / "8852" / "8856" / "8860" / "8880" / "8920" / "8940" / "8952" / "8956" / "8960" / "8980" / "9020" / "9040" / "9052" / "9056" / "9060" / "9080" / "9120" / "9140" / "9152" / "9156" / "9160" / "9180" / "9200" / "9220" / "9240" / "9252" / "9256" / "9260" / "9280" / "9320" / "9340" / "9352" / "9356" / "9360" / "9380" / "9420" / "9440" / "9452" / "9456" / "9460" / "9480" / "9520" / "9540" / "9552" / "9556" / "9560" / "9580" / "9600" / "9620" / "9640" / "9652" / "9656" / "9660" / "9680" / "9720" / "9740" / "9752" / "9756" / "9760" / "9780" / "9820" / "9840" / "9852" / "9856" / "9860" / "9880" / "9920" / "9940" / "9952" / "9956" / "9960" / "9980")
+   { return (text()); }
+
+IsoStdYear =
+  ([0-9] [0-9] [0-9] ("1" / "3" / "5" / "7" / "9") /
+  [0-9] [0-9] ("0" / "2" / "4" / "6" / "8") ("2" / "6") /
+  [0-9] [0-9] ("1" / "3" / "5" / "7" / "9") ("0" / "4" / "8") /
+  "0100" / "0200" / "0300" / "0500" / "0600" / "0700" / "0900" / "1000" /
+  "1100" / "1300" / "1400" / "1500" / "1700" / "1800" / "1900" /
+  "2100" / "2200" / "2300" / "2500" / "2600" / "2700" / "2900" /
+  "3000" / "3100" / "3300" / "3400" / "3500" / "3700" / "3800" / "3900" /
+  "4100" / "4200" / "4300" / "4500" / "4600" / "4700" / "4900" / "5000" /
+  "5100" / "5300" / "5400" / "5500" / "5700" / "5800" / "5900" /
+  "6100" / "6200" / "6300" / "6500" / "6600" / "6700" / "6900" /
+  "7000" / "7100" / "7300" / "7400" / "7500" / "7700" / "7800" / "7900" /
+  "8100" / "8200" / "8300" / "8500" / "8600" / "8700" / "8900" /
+  "9000" / "9100" / "9300" / "9400" / "9500" / "9700" / "9800" / "9900")
+  { return (text()); }
+
+IsoYear
+  = [0-9] [0-9] [0-9] [0-9]  { return (text()); }
+
 
 DateWithTime "datetime"
   = (year:Int "-" month:MonthExpression "-" day:DayExpression
   	"T" hours:HourExpression ":" minutes:MinuteExpression
     timezone:Timezone / year:Int "-" month:MonthExpression "-" day:DayExpression
   	"T" hours:HourExpression ":" minutes:MinuteExpression)
-  { return options.makeDate(new Date(text()), { type: NATIVEDATE }); }
+  { return options.makeDate(getDate(text()), { type: NATIVEDATE, parser: "datetime" }); }
 
 DateTimeWithSec "datetimesec"
   = (year:Int "-" month:MonthExpression "-" day:DayExpression
@@ -117,14 +245,14 @@ DateTimeWithSec "datetimesec"
     timezone:Timezone / year:Int "-" month:MonthExpression "-" day:DayExpression
   	"T" hours:HourExpression ":" minutes:MinuteExpression ":"
     seconds:SecondExpression)
-  { return options.makeDate(new Date(text()), { type: NATIVEDATE }); }
+  { return options.makeDate(getDate(text()), { type: NATIVEDATE, parser: "datetimesec" }); }
 
 Date "date"
   = year:Int "-" month:MonthExpression "-" day:DayExpression
   	"T" hours:HourExpression ":" minutes:MinuteExpression ":"
     seconds:SecondExpression "." milliseconds:MillisecondExpression
     timezone:Timezone
-  { return options.makeDate(new Date(
+  { return options.makeDate(getDate(
   	parseInt(year.join(""), 10),
     parseInt(month.join(""), 10) - 1,
     parseInt(day.join(""), 10),
@@ -132,7 +260,7 @@ Date "date"
     parseInt(minutes.join(""), 10),
     parseInt(seconds.join(""), 10),
     parseInt(milliseconds.join(""), 10)
-  ), { type: NATIVEDATE }); }
+  ), { type: NATIVEDATE, "parser": "date" }); }
 
 MonthExpression "month"
   = "12" / "11" / "10" / "0" [1-9] / [1-9]
@@ -153,7 +281,7 @@ MillisecondExpression "millisecond"
   = [0-9] [0-9] [0-9] / [0-9] [0-9] / [0-9]
 
 Timezone "tiezone"
-  = "Z" / PlusOrMinues [0-9][0-9] ":" [0-9][0-9]
+  = "Z" / PlusOrMinues [0-9][0-9] ":"? [0-9][0-9]
 
 PlusOrMinues "plusorminus"
   = "+" / "-"
@@ -162,19 +290,23 @@ Quarter "quarter"
   = Number _ "quarter"i "s"? { return options.makeDuration({ quarters: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
 
 Shortquarter "shortquarter"
-  = Number _ "quarter"i "s"? { return options.makeDuration({ quarters: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+  = Number _ "q"i "s"? { return options.makeDuration({ quarters: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
 
 Weekday "weekday"
   = Number _ "weekday"i "s"? { return options.makeDuration({ weekdays: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
 
 Shortweekday "shortweekday"
-  = Number _ "wd" "s"? { return options.makeDuration({ weekdays: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+  = Number _ "wd"i "s"? { return options.makeDuration({ weekdays: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
 
 Year "year"
   = Number _ "year"i "s"? { return options.makeDuration({ years: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
 
 Shortyear "shortyear"
-  = Number _ "a" "s"? { return options.makeDuration({ years: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+  = Number _ "a"i "s"? { return options.makeDuration({ years: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+Shortyeary "shortyeary"
+    = Number _ "y"i "s"? { return options.makeDuration({ years: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
 
 Shortmillisecond "ms"
   = Number _ "ms" "s"? { return options.makeDuration({ milliseconds: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
@@ -186,13 +318,22 @@ Month "month"
   = Number _ "month"i "s"? { return options.makeDuration({ months: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
 
 Shortmonth "Shortmonth"
-  = Number _ "m" "s"? { return options.makeDuration({ months: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+  = Number _ "M" "M"? "s"? { return options.makeDuration({ months: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+Shortmonthalt "Shortmonthalt"
+  = Number _ "l"i "s"? { return options.makeDuration({ months: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
 
 Minute "minute"
   = Number _ "minute"i "s"? { return options.makeDuration({ minutes: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
 
 Shortminutes "shortminutes"
   = Number _ "min"i "s"? { return options.makeDuration({ minutes: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+
+ShortminutesAlt "shortminutesalt"
+  = Number _ "tm"i "s"? { return options.makeDuration({ minutes: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
 
 Shorterminutes "shorterminutes"
   = Number _ "mm" "s"? { return options.makeDuration({ minutes: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
@@ -201,13 +342,13 @@ Hour "hour"
   = Number _ "hour"i "s"? { return options.makeDuration({ hours: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
 
 Shorthour "shorthour"
-  = Number _ "h" "s"? { return options.makeDuration({ hours: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+  = Number _ "h"i "s"? { return options.makeDuration({ hours: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
 
 Day "day"
   = Number _ "day"i "s"? { return options.makeDuration({ days: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
 
 Shortday "shortday"
-  = Number _ "d" "s"? { return options.makeDuration({ days: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+  = Number _ "d"i "s"? { return options.makeDuration({ days: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
 
 Week "week"
   = Number _ "week"i "s"? { return options.makeDuration({ weeks: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
@@ -216,16 +357,20 @@ Fortnight "fortnight"
   = Number _ "fortnight"i "s"? { return options.makeDuration({ weeks: parseFloat(text(), 10) * 2 }, { type: DURATIONOBJECT }); }
 
 Shortfortnight "Shortfortnight"
-  = Number _ "fn" "s"? { return options.makeDuration({ weeks: parseFloat(text(), 10) * 2 }, { type: DURATIONOBJECT }); }
+  = Number _ "fn"i "s"? { return options.makeDuration({ weeks: parseFloat(text(), 10) * 2 }, { type: DURATIONOBJECT }); }
 
 Shortweek "shortweek"
-  = Number _ "w" "s"? { return options.makeDuration({ weeks: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+  = Number _ "w"i "s"? { return options.makeDuration({ weeks: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
 
 Second "second"
   = Number _ "second"i "s"? { return options.makeDuration({ seconds: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
 
+ShortsecondAlt "s"
+  = Number _ "sec"i "s"? { return options.makeDuration({ seconds: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+
+
 Shortsecond "s"
-  = Number _ "s" "s"? { return options.makeDuration({ seconds: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+  = Number _ "s"i "s"i? "s"? { return options.makeDuration({ seconds: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
 
 Unitless "u"
   = Number _ "u" "s"? { return { unitless: parseFloat(text(), 10) }; }

@@ -3,6 +3,10 @@ require("luxon");
 var datecalculator = require("./datecalculator.js").simpleCalculator;
 var datefnsCalculator = require("./datecalculator.js").datefnsCalculator;
 var luxonCalculator = require("./datecalculator.js").luxonCalculator;
+var simpleluxonCalculator = require("./datecalculator.js")
+  .simpleluxonCalculator;
+var momentCalculator = require("./datecalculator.js").momentCalculator;
+
 var out = function(calc) {
   console.log("This is a demo A: calc`now` = \n\t\t" + calc`now`.toString());
   console.log("This is a demo B: calc`5d` = \n\t\t" + calc`5d`.toString());
@@ -22,3 +26,5 @@ var out = function(calc) {
 out(datecalculator);
 out(datefnsCalculator);
 out(luxonCalculator);
+out(simpleluxonCalculator);
+out(momentCalculator);

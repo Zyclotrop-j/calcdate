@@ -1,0 +1,57 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Parsing without a binding Parses iso-dates  parse " 2009-05-19 " successfully 1`] = `" 2009-05-19  = Tue May 19 2009 00:00:00 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse " 20090519 " successfully 1`] = `" 20090519  = Tue May 19 2009 00:00:00 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "2007-04-06T00:00" successfully 1`] = `"2007-04-06T00:00 = Fri Apr 06 2007 00:00:00 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "2009" successfully 1`] = `"2009 = Thu Jan 01 2009 00:00:00 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "2009" successfully 2`] = `"2009 = Thu Jan 01 2009 00:00:00 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "2009-001" successfully 1`] = `"2009-001 = Fri Jan 02 2009 00:00:00 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "2009-05" successfully 1`] = `"2009-05 = Fri May 01 2009 00:00:00 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "2009-05-19" successfully 1`] = `"2009-05-19 = Tue May 19 2009 00:00:00 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "2009-05-19" successfully 2`] = `"2009-05-19 = Tue May 19 2009 00:00:00 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "2009-05-19T00:00" successfully 1`] = `"2009-05-19T00:00 = Tue May 19 2009 00:00:00 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "2009-05-19T14:31" successfully 1`] = `"2009-05-19T14:31 = Tue May 19 2009 14:31:00 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "2009-05-19T14:39:22" successfully 1`] = `"2009-05-19T14:39:22 = Tue May 19 2009 14:39:22 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "2009-05-19T14:39:22+0600" successfully 1`] = `"2009-05-19T14:39:22+0600 = Tue May 19 2009 08:39:22 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "2009-05-19T14:39:22-06:00" successfully 1`] = `"2009-05-19T14:39:22-06:00 = Tue May 19 2009 20:39:22 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "2009-05-19T14:39Z" successfully 1`] = `"2009-05-19T14:39Z = Tue May 19 2009 14:39:00 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "2009-12T12:34" successfully 1`] = `"2009-12T12:34 = Tue Dec 01 2009 12:34:00 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "200905" successfully 1`] = `"200905 = Fri May 01 2009 00:00:00 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "200912T1234" successfully 1`] = `"200912T1234 = Tue Dec 01 2009 12:34:00 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "2009001" successfully 1`] = `"2009001 = Fri Jan 02 2009 00:00:00 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "20070406 0000" successfully 1`] = `"20070406 0000 = Fri Apr 06 2007 00:00:00 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "20090519 0000" successfully 1`] = `"20090519 0000 = Tue May 19 2009 00:00:00 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "20090519 1431" successfully 1`] = `"20090519 1431 = Tue May 19 2009 14:31:00 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "20090519 1439Z" successfully 1`] = `"20090519 1439Z = Tue May 19 2009 14:39:00 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "20090519 143922" successfully 1`] = `"20090519 143922 = Tue May 19 2009 14:39:22 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "20090519 143922+0600" successfully 1`] = `"20090519 143922+0600 = Tue May 19 2009 08:39:22 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "20090519 143922-06:00" successfully 1`] = `"20090519 143922-06:00 = Tue May 19 2009 20:39:22 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "20090519" successfully 1`] = `"20090519 = Tue May 19 2009 00:00:00 GMT+0000 (Greenwich Mean Time)"`;
+
+exports[`Parsing without a binding Parses iso-dates  parse "20090519" successfully 2`] = `"20090519 = Tue May 19 2009 00:00:00 GMT+0000 (Greenwich Mean Time)"`;
