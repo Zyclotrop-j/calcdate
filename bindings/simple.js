@@ -63,7 +63,7 @@ export const simple = ({
     quarters: (d, a) => d - (-a * 1000 * 60 * 60 * 24 * 7 * 52) / 4,
     years: (d, a) => d - -a * 1000 * 60 * 60 * 24 * 7 * 52
   };
-  const substractMap = {
+  const subtractMap = {
     date: (a, b) => ({ milliseconds: a.getTime() - b.getTime() }),
     unitless: (d, a) => d - a * 1,
     milliseconds: (d, a) => d - a * 1,
@@ -160,8 +160,8 @@ export const simple = ({
     add: (a, b) => {
       return mergeOp(a, b, (a, b) => a + b, addMap);
     },
-    substract: (a, b) => {
-      return mergeOp(a, b, (a, b) => a - b, substractMap);
+    subtract: (a, b) => {
+      return mergeOp(a, b, (a, b) => a - b, subtractMap);
     },
     multiply: (a, b) => {
       return scalarMultiply(a, b);

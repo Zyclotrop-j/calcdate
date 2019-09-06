@@ -1,12 +1,12 @@
 export const test = (
   __,
-  { makeDuration, makeDate, add, substract, multiply, divide }
+  { makeDuration, makeDate, add, subtract, multiply, divide }
 ) => {
   return {
     makeDuration: makeDuration,
     makeDate: makeDate,
     add: add,
-    substract: substract,
+    subtract: subtract,
     multiply: multiply,
     divide: divide
   };

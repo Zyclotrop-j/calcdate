@@ -63,13 +63,13 @@ export const simpleluxon = (
         return { unitless: a.unitless + b.unitless };
       }
       if (Duration.isDuration(a) && Duration.isDuration(b)) {
-        return a.add(b);
+        return a.plus(b);
       }
       if (DateTime.isDateTime(a) && a.isValid && Duration.isDuration(b)) {
-        return a.add(b);
+        return a.plus(b);
       }
       if (DateTime.isDateTime(b) && b.isValid && Duration.isDuration(a)) {
-        return b.add(a);
+        return b.plus(a);
       }
       const e = `Invalid arguments for 'add', expected (date, duration), (duration, date), (duration, duration) but found (${
         a.invalidExplanation ? `Invalid date ${a.invalidExplanation}` : typeof a
@@ -79,18 +79,18 @@ export const simpleluxon = (
       console.error(e, a, b);
       throw new Error(e);
     },
-    substract: (a, b) => {
+    subtract: (a, b) => {
       if (isUnitless(a) && isUnitless(b)) {
         return { unitless: a.unitless - b.unitless };
       }
       if (Duration.isDuration(a) && Duration.isDuration(b)) {
-        return a.substract(b);
+        return a.minus(b);
       }
       if (DateTime.isDateTime(a) && a.isValid && Duration.isDuration(b)) {
         // date - duration
-        return a.substract(b);
+        return a.minus(b);
       }
-      const e = `Invalid arguments for 'substract', expected (date, duration) or (duration, duration) but found (${
+      const e = `Invalid arguments for 'subtract', expected (date, duration) or (duration, duration) but found (${
         a.invalidExplanation ? `Invalid date ${a.invalidExplanation}` : typeof a
       }, ${
         b.invalidExplanation ? `Invalid date ${b.invalidExplanation}` : typeof b

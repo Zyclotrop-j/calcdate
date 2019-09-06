@@ -186,7 +186,7 @@ export const datefns = (
       console.error(e, a, b);
       throw new Error(e);
     },
-    substract: (a, b) => {
+    subtract: (a, b) => {
       if (isUnitless(a) && isUnitless(b)) {
         return { unitless: a.unitless - b.unitless };
       }
@@ -201,7 +201,7 @@ export const datefns = (
       }
       if (isValid(a) && isValid(b)) {
         console.warn(
-          "Substracting two dates from each other is potentially unsafe as a loss of information occurs!"
+          "subtracting two dates from each other is potentially unsafe as a loss of information occurs!"
         );
         return Object.assign(newDuration(), {
           milliseconds: differenceInMilliseconds(a, b)
@@ -221,7 +221,7 @@ export const datefns = (
           b
         );
       }
-      const e = `Invalid arguments for 'substract', expected (date, duration), (duration, date), (duration, duration) but found (${getType(
+      const e = `Invalid arguments for 'subtract', expected (date, duration), (duration, date), (duration, duration) but found (${getType(
         a
       )}, ${getType(b)})`;
       console.error(e, a, b);

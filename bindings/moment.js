@@ -55,7 +55,7 @@ export const moment = (
       console.error(e, a, b);
       throw new Error(e);
     },
-    substract: (a, b) => {
+    subtract: (a, b) => {
       if (isUnitless(a) && isUnitless(b)) {
         return { unitless: a.unitless - b.unitless };
       }
@@ -66,7 +66,7 @@ export const moment = (
         // date - duration
         return a.subtract(b);
       }
-      const e = `Invalid arguments for 'substract', expected (date, duration) or (duration, duration) but found (${
+      const e = `Invalid arguments for 'subtract', expected (date, duration) or (duration, duration) but found (${
         a.invalidExplanation ? `Invalid date ${a.invalidExplanation}` : typeof a
       }, ${
         b.invalidExplanation ? `Invalid date ${b.invalidExplanation}` : typeof b

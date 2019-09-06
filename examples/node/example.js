@@ -23,8 +23,13 @@ var out = function(calc) {
       calc`now + P4Y - 2weeks`.toString()
   );
 };
+console.log("Simple");
 out(datecalculator);
+console.log("date-fns");
 out(datefnsCalculator);
+console.log("luxon");
 out(luxonCalculator);
+console.log("Simple luxon");
 out(simpleluxonCalculator);
+console.log("moment");
 out(momentCalculator);

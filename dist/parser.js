@@ -150,7 +150,7 @@
           function(head, tail) {
                 return tail.reduce(function(result, element) {
                   if (element[1] === "+") { return options.add(result, element[3]); }
-                  if (element[1] === "-") { return options.substract(result, element[3]) }
+                  if (element[1] === "-") { return options.subtract(result, element[3]) }
                 }, head);
               },
           "*",
@@ -223,7 +223,7 @@
           peg$literalExpectation("now()", true),
           "today()",
           peg$literalExpectation("today()", true),
-          function() { return options.makeDate(getDate(), { type: NATIVEDATE, parser: "now" }); },
+          function() { return options.makeDate(new Date(), { type: NATIVEDATE, parser: "now" }); },
           peg$otherExpectation("interpoltion"),
           "%",
           peg$literalExpectation("%", false),
@@ -255,21 +255,21 @@
           peg$classExpectation([["0", "9"]], false, false),
           /^[2-9]/,
           peg$classExpectation([["2", "9"]], false, false),
-          function() { return options.makeDate(getDate(parseInt(text(), 10)), { type: NATIVEDATE, parser: "dateyear" }); },
+          function() { return options.makeDate(new Date(parseInt(text(), 10)), { type: NATIVEDATE, parser: "dateyear" }); },
           peg$otherExpectation("datemonth"),
-          function(year, month) { return options.makeDate(getDate(
+          function(year, month) { return options.makeDate(new Date(
             	parseInt(year.join(""), 10),
               parseInt(month.join(""), 10) - 1
             ), { type: NATIVEDATE, parser: "datemonth" }); },
           peg$otherExpectation("completedate"),
-          function(year, month, day) { return options.makeDate(getDate(
+          function(year, month, day) { return options.makeDate(new Date(
             	parseInt(year.join(""), 10),
               parseInt(month.join(""), 10) - 1,
               parseInt(day.join(""), 10)
             ), { type: NATIVEDATE, parser: "completedate" }); },
           peg$otherExpectation("properiso"),
           function(v) { return options.makeDate(v); },
-          function(date, time) { return options.makeDate(getDate(`${date.year}-${date.month}-${date.day}T${time[0].hours}:${time[0].minutes}:${time[0].seconds}${time[1]}`), { type: NATIVEDATE, parser: "properiso" }); },
+          function(date, time) { return options.makeDate(new Date(`${date.year}-${date.month}-${date.day}T${time[0].hours}:${time[0].minutes}:${time[0].seconds}${time[1]}`), { type: NATIVEDATE, parser: "properiso" }); },
           /^[0-2]/,
           peg$classExpectation([["0", "2"]], false, false),
           /^[1-9]/,
@@ -312,7 +312,7 @@
           /^[0-8]/,
           peg$classExpectation([["0", "8"]], false, false),
           function(year, month, day) { return { year, month: "02", day: day.join("") }; },
-          function(o) { const tmp = getDate(parseInt(o.year, 10), 0); tmp.setDate(tmp.getDate() + parseInt(o.days, 10)); return { year: o.year, month: `${tmp.getMonth() + 1}`.padStart(2, "0"), day: `${tmp.getDate()}`.padStart(2, "0") }; },
+          function(o) { const tmp = new Date(parseInt(o.year, 10), 0); tmp.setDate(tmp.getDate() + parseInt(o.days, 10)); return { year: o.year, month: `${tmp.getMonth() + 1}`.padStart(2, "0"), day: `${tmp.getDate()}`.padStart(2, "0") }; },
           function(year, month) { return { year, month: month.join(""), day: "01" } },
           function(year) { return { year, month: "01", day: "01" }; },
           function() { return (text()); },
@@ -402,7 +402,7 @@
           peg$literalExpectation("2015", false),
           "2016",
           peg$literalExpectation("2016", false),
-          function() { const d = getDate(`${text().slice(0, -3)}59Z`); d.leapSecond = true; return d; },
+          function() { const d = new Date(`${text().slice(0, -3)}59Z`); d.leapSecond = true; return d; },
           "4",
           peg$literalExpectation("4", false),
           "6",
@@ -1816,13 +1816,13 @@
           "9900",
           peg$literalExpectation("9900", false),
           peg$otherExpectation("datetime"),
-          function() { return options.makeDate(getDate(text()), { type: NATIVEDATE, parser: "datetime" }); },
+          function() { return options.makeDate(new Date(text()), { type: NATIVEDATE, parser: "datetime" }); },
           peg$otherExpectation("datetimesec"),
-          function() { return options.makeDate(getDate(text()), { type: NATIVEDATE, parser: "datetimesec" }); },
+          function() { return options.makeDate(new Date(text()), { type: NATIVEDATE, parser: "datetimesec" }); },
           peg$otherExpectation("date"),
           ".",
           peg$literalExpectation(".", false),
-          function(year, month, day, hours, minutes, seconds, milliseconds, timezone) { return options.makeDate(getDate(
+          function(year, month, day, hours, minutes, seconds, milliseconds, timezone) { return options.makeDate(new Date(
             	parseInt(year.join(""), 10),
               parseInt(month.join(""), 10) - 1,
               parseInt(day.join(""), 10),
@@ -2437,12 +2437,6 @@
 
       return stack[0];
     }
-
-
-      function getDate(str, ...args) {
-        return new Date(str, ...args);
-      }
-
 
     peg$result = peg$parseRule(peg$startRuleIndex);
 

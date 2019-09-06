@@ -22,7 +22,7 @@ const parser = function makeParser(_options) {
       makeDate: makeThrow(`"makeDate" option missing`),
       makeInterval: makeThrow(`"makeInterval" option missing`),
       add: makeThrow(`"add" option missing`),
-      substract: makeThrow(`"substract" option missing`),
+      subtract: makeThrow(`"subtract" option missing`),
       multiply: makeThrow(`"multiply" option missing`),
       divide: makeThrow(`"divide" option missing`)
     },

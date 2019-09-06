@@ -33,7 +33,7 @@ describe("Parsing without a binding", () => {
     operations.makeDuration = jest.fn(duration => ({ duration }));
     operations.makeDate = jest.fn(date => ({ date }));
     operations.add = jest.fn((a, b) => ({ add: [a, b] }));
-    operations.substract = jest.fn((a, b) => ({ substract: [a, b] }));
+    operations.subtract = jest.fn((a, b) => ({ subtract: [a, b] }));
     operations.multiply = jest.fn((a, b) => ({ multiply: [a, b] }));
     operations.divide = jest.fn((a, b) => ({ divide: [a, b] }));
     calculator = parser(testbinding(parser, operations));
@@ -280,7 +280,7 @@ describe("Parsing without a binding", () => {
   });
 
   describe("Recognizes '-'", () => {
-    const cop = "substract";
+    const cop = "subtract";
     it(" calls binding callbacks for two operands", () => {
       const mockCallback = operations[cop];
       const duration = operations.makeDuration;
@@ -497,7 +497,7 @@ describe("Parsing without a binding", () => {
       });
       const result2 = calculator`1s - 1min / 1d`;
       expect(result2).toEqual({
-        substract: [
+        subtract: [
           operations.makeDuration.mock.results[0].value,
           operations.divide.mock.results[0].value
         ]
@@ -514,7 +514,7 @@ describe("Parsing without a binding", () => {
       const result2 = calculator`(1s - 1min) / 1d`;
       expect(result2).toEqual({
         divide: [
-          operations.substract.mock.results[0].value,
+          operations.subtract.mock.results[0].value,
           operations.makeDuration.mock.results[2].value
         ]
       });
@@ -574,7 +574,7 @@ describe("Parsing without a binding", () => {
       "2009367",
       "2009-",
       "20070405T24:50",
-      // "2009-000", // substract operation!! -> valid input
+      // "2009-000", // subtract operation!! -> valid input
       "2009-M511",
       "2009M511",
       "2009-05-19T14a39r",
