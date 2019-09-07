@@ -23,12 +23,12 @@ There are **no direct dependencies**!
 
 We recommend using this lib with your favorite date-time lib, use the bindings provided.
 
-| import                | required dependency                      | import                                                  |
-| --------------------- | ---------------------------------------- | ------------------------------------------------------- |
-| datefnsCalculator     | [date-fns](https://date-fns.org)         | `import { datefnsCalculator } from "datecalculator`     |
-| luxonCalculator       | [luxon](https://moment.github.io/luxon/) | `import { luxonCalculator } from "datecalculator`       |
-| simpleluxonCalculator | [luxon](https://moment.github.io/luxon/) | `import { simpleluxonCalculator } from "datecalculator` |
-| momentCalculator      | [moment](https://momentjs.com/)          | `import { momentCalculator } from "datecalculator`      |
+| import                | required dependency                      | import                                                    |
+| --------------------- | ---------------------------------------- | --------------------------------------------------------- |
+| datefnsCalculator     | [date-fns](https://date-fns.org)         | `import { datefnsCalculator } from "datecalculator";`     |
+| luxonCalculator       | [luxon](https://moment.github.io/luxon/) | `import { luxonCalculator } from "datecalculator";`       |
+| simpleluxonCalculator | [luxon](https://moment.github.io/luxon/) | `import { simpleluxonCalculator } from "datecalculator";` |
+| momentCalculator      | [moment](https://momentjs.com/)          | `import { momentCalculator } from "datecalculator";`      |
 
 ## Examples
 
