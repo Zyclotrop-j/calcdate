@@ -1,8 +1,9 @@
 export const test = (
   __,
-  { makeDuration, makeDate, add, subtract, multiply, divide }
+  { makeInterval, makeDuration, makeDate, add, subtract, multiply, divide }
 ) => {
   return {
+    makeInterval: makeInterval,
     makeDuration: makeDuration,
     makeDate: makeDate,
     add: add,

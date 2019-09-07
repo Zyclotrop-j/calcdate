@@ -59,9 +59,9 @@ export const simple = ({
     days: (d, a) => d - -a * 1000 * 60 * 60 * 24,
     weekdays: (d, a) => d - -a * 1000 * 60 * 60 * 24,
     weeks: (d, a) => d - -a * 1000 * 60 * 60 * 24 * 7,
-    months: (d, a) => d - -a * 1000 * 60 * 60 * 24 * 31,
-    quarters: (d, a) => d - (-a * 1000 * 60 * 60 * 24 * 7 * 52) / 4,
-    years: (d, a) => d - -a * 1000 * 60 * 60 * 24 * 7 * 52
+    months: (d, a) => d - -a * 1000 * 60 * 60 * 24 * 30.436875,
+    quarters: (d, a) => d - -a * 1000 * 60 * 60 * 24 * 91.310625,
+    years: (d, a) => d - -a * 1000 * 60 * 60 * 24 * 365.2425
   };
   const subtractMap = {
     date: (a, b) => ({ milliseconds: a.getTime() - b.getTime() }),
@@ -73,9 +73,9 @@ export const simple = ({
     days: (d, a) => d - a * 1000 * 60 * 60 * 24,
     weekdays: (d, a) => d - a * 1000 * 60 * 60 * 24,
     weeks: (d, a) => d - a * 1000 * 60 * 60 * 24 * 7,
-    months: (d, a) => d - a * 1000 * 60 * 60 * 24 * 31,
-    quarters: (d, a) => d - (a * 1000 * 60 * 60 * 24 * 7 * 52) / 4,
-    years: (d, a) => d - a * 1000 * 60 * 60 * 24 * 7 * 52
+    months: (d, a) => d - a * 1000 * 60 * 60 * 24 * 30.436875,
+    quarters: (d, a) => d - a * 1000 * 60 * 60 * 24 * 91.310625,
+    years: (d, a) => d - a * 1000 * 60 * 60 * 24 * 365.2425
   };
   function mergeOp(a, b, f, opMap) {
     if (isValidDate(a) && isValidDate(b)) {

@@ -30,6 +30,7 @@ describe("Parsing without a binding", () => {
     global.Date.now = RealDate.now;
   });
   beforeEach(() => {
+    operations.makeInterval = jest.fn(interval => ({ interval }));
     operations.makeDuration = jest.fn(duration => ({ duration }));
     operations.makeDate = jest.fn(date => ({ date }));
     operations.add = jest.fn((a, b) => ({ add: [a, b] }));
@@ -37,6 +38,21 @@ describe("Parsing without a binding", () => {
     operations.multiply = jest.fn((a, b) => ({ multiply: [a, b] }));
     operations.divide = jest.fn((a, b) => ({ divide: [a, b] }));
     calculator = parser(testbinding(parser, operations));
+    /*
+    const xcalc = parser(testbinding(parser, operations));
+    calculator = (a, ...args) => {
+      try {
+        return xcalc(a, ...args);
+      } catch (e) {
+        console.error(
+          `Failed on ${args.map((i, idx) => `${a[idx]}${i}`).join("")}${
+            args[args.length - 1]
+          }`
+        );
+        throw e;
+      }
+    };
+    */
   });
   afterEach(() => {
     calculator = null;
@@ -599,7 +615,171 @@ describe("Parsing without a binding", () => {
     );
   });
 
-  describe("Parses iso-durations", () => {});
+  describe("Parses iso-durations", () => {
+    const durations = [
+      "P1Y2M3DT4H05M600S", // 1 year, 2 months, 3 days, 4 hours, 5 minutes, 600 seconds
+      "PT3H5M", // 3 hours, 5 minus
+      "P1Y", // 1 year
+      "P-1Y1M", // -1 year, 1 month -> effectively 11 month
+      "P1DT-30S", // 1 day, -30 seconds
 
-  describe("Parses iso-intervals", () => {});
+      "P1Y",
+      "P2M",
+      "P3D",
+      "PT4H",
+      "PT05M",
+      "PT600S",
+      "P1y2m3dT4h5m6s",
+
+      "P00021015T103020",
+      "P00021015",
+      "P0002-10-15T10:30:20",
+      "P0002-10-15",
+      "+P00021015T103020",
+      "+P00021015",
+      "+P0002-10-15T10:30:20",
+      "+P0002-10-15",
+      "-P00021015T103020",
+      "-P00021015",
+      "-P0002-10-15T10:30:20",
+      "-P0002-10-15",
+      "P+00021015T103020",
+      "P0002-1015",
+      "P0002--10-15T10:+30:20",
+      "P0002-10--15",
+      "-P0002-10--15"
+    ];
+    durations.forEach(i =>
+      it(` parse "${i}" successfully`, () => {
+        const result = calculator`${i}`;
+        expect(result).toBeDefined();
+        expect(`${i} = ${JSON.stringify(result.duration)}`).toMatchSnapshot();
+      })
+    );
+  });
+
+  describe("Parses iso-intervals", () => {
+    const durations = [
+      "P1Y2M3DT4H05M600S", // 1 year, 2 months, 3 days, 4 hours, 5 minutes, 600 seconds
+      "PT3H5M", // 3 hours, 5 minus
+      "P1Y", // 1 year
+      "P-1Y1M", // -1 year, 1 month -> effectively 11 month
+      "P1DT-30S", // 1 day, -30 seconds
+      "P1Y",
+      "P2M",
+      "P3D",
+      "PT4H",
+      "PT05M",
+      "PT600S",
+      "P1y2m3dT4h5m6s",
+      "P00021015T103020",
+      "P00021015",
+      "P0002-10-15T10:30:20",
+      "P0002-10-15",
+      "+P00021015T103020",
+      "+P00021015",
+      "+P0002-10-15T10:30:20",
+      "+P0002-10-15",
+      "-P00021015T103020",
+      "-P00021015",
+      "-P0002-10-15T10:30:20",
+      "-P0002-10-15",
+      "P+00021015T103020",
+      "P0002-1015",
+      "P0002--10-15T10:+30:20",
+      "P0002-10--15",
+      "-P0002-10--15"
+    ];
+    const dates = [
+      "2009-12T12:34",
+      "2009",
+      "2009-05-19",
+      " 2009-05-19 ",
+      "2009-05",
+      "2009-001",
+      "2009-05-19",
+      "2009-05-19T00:00",
+      "2009-05-19T14:31",
+      "2009-05-19T14:39:22",
+      "2009-05-19T14:39Z",
+      "2009-05-19T14:39:22-06:00",
+      "2009-05-19T14:39:22+0600",
+      "2007-04-06T00:00",
+      "200912T1234",
+      "2009",
+      "20090519",
+      " 20090519 ",
+      "200905",
+      "2009001",
+      "20090519",
+      "20090519 0000",
+      "20090519 1431",
+      "20090519 143922",
+      "20090519 1439Z",
+      "20090519 143922-06:00",
+      "20090519 143922+0600",
+      "20070406 0000"
+    ];
+    // durations
+    // dates
+    dates.forEach(a => {
+      it(` parse "${a}/date" successfully`, () => {
+        dates.forEach(b => {
+          if (a === b) return;
+          const result = calculator`${a}/${b}`;
+          expect(result).toBeDefined();
+          expect(
+            `${a}/${b} = ${JSON.stringify(result.duration)}`
+          ).toMatchSnapshot();
+        });
+      });
+    });
+    durations.forEach(duration => {
+      it(` parse "date/${duration}" and "${duration}/date"  successfully`, () => {
+        dates.forEach(date => {
+          const result = calculator`${date}/${duration}`;
+          expect(result).toBeDefined();
+          expect(
+            `${date}/${duration} = ${JSON.stringify(result.duration)}`
+          ).toMatchSnapshot();
+          const result2 = calculator`${duration}/${date}`;
+          expect(result2).toBeDefined();
+          expect(
+            `${duration}/${date} = ${JSON.stringify(result2.interval)}`
+          ).toMatchSnapshot();
+        });
+      });
+    });
+  });
+
+  describe("can handle 'unitless' numbers", () => {
+    it("Can parse unitless", () => {
+      expect(calculator`1`).toEqual({ unitless: 1 });
+      expect(calculator`2`).toEqual({ unitless: 2 });
+      expect(calculator`0`).toEqual({ unitless: 0 });
+      expect(calculator`5`).toEqual({ unitless: 5 });
+      expect(calculator`100`).toEqual({ unitless: 100 });
+      expect(calculator`-1`).toEqual({ unitless: -1 });
+      expect(calculator`-0`).toEqual({ unitless: -0 });
+      expect(calculator`-100`).toEqual({ unitless: -100 });
+      expect(calculator`01`).toEqual({ unitless: 1 });
+      expect(calculator`-01`).toEqual({ unitless: -1 });
+      expect(calculator`1`).toEqual({ unitless: 1 });
+      expect(calculator`0`).toEqual({ unitless: 0 });
+      expect(calculator`100`).toEqual({ unitless: 100 });
+      // expect(calculator`70000`).toEqual({ unitless: 70000 });
+      expect(calculator`-10`).toEqual({ unitless: -10 });
+      expect(calculator`-5`).toEqual({ unitless: -5 });
+      expect(calculator`0`).toEqual({ unitless: 0 });
+      // expect(calculator`00001`).toEqual({ unitless: 1 });
+      // expect(calculator`00123901`).toEqual({ unitless: 123901 });
+      expect(calculator`-09`).toEqual({ unitless: -9 });
+      expect(calculator`2.5`).toEqual({ unitless: 2.5 });
+      expect(calculator`-2.5`).toEqual({ unitless: -2.5 });
+      expect(calculator`1.0`).toEqual({ unitless: 1 });
+      expect(calculator`-1.0`).toEqual({ unitless: -1 });
+      expect(calculator`06.6`).toEqual({ unitless: 6.6 });
+      expect(calculator`-006.089`).toEqual({ unitless: -6.089 });
+    });
+  });
 });

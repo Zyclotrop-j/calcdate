@@ -86,6 +86,15 @@ export const luxon = (
           try {
             const maybedateobject = JSON.parse(a);
             if (Array.isArray(maybedateobject)) {
+              if (
+                typeof maybedateobject[0] === "string" &&
+                typeof maybedateobject[1] === "string"
+              ) {
+                return DateTime.fromFormat(
+                  maybedateobject[0],
+                  maybedateobject[1]
+                );
+              }
               return DateTime.fromObject(
                 maybedateobject[0],
                 maybedateobject[1]
@@ -128,9 +137,6 @@ export const luxon = (
       }
       if (Interval.isInterval(b) && DateTime.isDateTime(a)) {
         return a.plus(b.toDuration());
-      }
-      if (Interval.isInterval(b) && DateTime.isDateTime(a)) {
-        return Interval.fromDateTimes(b.start.minus(a), b.end.minus(a));
       }
       if (Duration.isDuration(a) && Duration.isDuration(b)) {
         return a.plus(b);

@@ -33,7 +33,7 @@ Factor
     Month / Minute / ShortminutesAlt / Shortminutes / Shorterminutes / Shortmonth / Shortmonthalt / Hour / Shortfortnight /
     Shorthour / Day / Weekday / Shortday / Week / Shortweekday /
     Second / ShortsecondAlt / Shortsecond / Quarter / Shortquarter / Shortweek /
-    Unitless / ProperIsoDate / Date / DateTimeWithSec / DateWithTime / CompleteDate / Datemonth / Dateyear / Integer
+    Unitless / ProperIsoDate / Date / DateTimeWithSec / DateWithTime / CompleteDate / Datemonth / Dateyear / UnitlessNumber / Integer
 
 IntervalExpression "intervalexpression"
   =   "~" interval:[^~]+ "~" { return options.makeInterval(interval.join(""), { type: INTERVALEXPRESION }) }
@@ -56,38 +56,76 @@ AnyDate
   =  ProperIsoDate / Date / DateTimeWithSec / DateWithTime / CompleteDate / Datemonth / Dateyear
 
 Duration "duration"
-  =  OPM "P" years:OptYearDur months:OptMonthDur weeks:OptWeekDur days:OptDayDur
+  =  IsoDuration / maybeminus:OPM "P" years:OptYearDur months:OptMonthDur weeks:OptWeekDur days:OptDayDur
   time:(("T" hours:OptHourDur minutes:OptMinuteDur seconds:OptSecondDur {
   	return { hours, minutes, seconds };
   }) / "" { return {} }) {
-  	return options.makeDuration(Object.assign({}, time, {
+    const t = Object.assign({}, time, {
     	years,
       months,
       weeks,
       days,
-    }), { type: DURATIONOBJECT });
+    });
+    if(maybeminus === "-") return options.makeDuration(Object.entries(t).reduce((p, [k, v]) => Object.assign(p, {
+      [k]: v * -1
+    }), {}), { type: DURATIONOBJECT });
+  	return options.makeDuration(t, { type: DURATIONOBJECT });
+  }
+
+IsoDuration "isoduration"
+  =  maybeminus:OPM "P" years:OptIsoYearDur "-"? months:OptIsoMonthDur "-"? days:OptIsoDayDur
+  time:(("T" hours:OptIsoHourDur ":"? minutes:OptIsoMinuteDur ":"? seconds:OptIsoSecondDur {
+  	return { hours, minutes, seconds };
+  }) / "" { return {} }) {
+    const t = Object.assign({}, time, {
+    	years,
+      months,
+      days,
+    });
+    if(maybeminus === "-") return options.makeDuration(Object.entries(t).reduce((p, [k, v]) => Object.assign(p, {
+      [k]: v * -1
+    }), {}), { type: DURATIONOBJECT });
+  	return options.makeDuration(t, { type: DURATIONOBJECT });
   }
 
 OptHourDur
- = (OPM [0-9,.]* "H") { return parseFloat(text()) } / "" { return 0; }
+ = (OPM [0-9,.]* "H"i) { return parseFloat(text()) } / "" { return 0; }
+
+OptIsoHourDur
+= (OPM [0-9] [0-9]) { return parseFloat(text()) }
 
 OptMinuteDur
-= (OPM [0-9,.]* "M") { return parseFloat(text()) } / "" { return 0; }
+= (OPM [0-9,.]* "M"i) { return parseFloat(text()) } / "" { return 0; }
+
+OptIsoMinuteDur
+= (OPM [0-9] [0-9]) { return parseFloat(text()) }
 
 OptSecondDur
- = (OPM [0-9,.]* "S") { return parseFloat(text()) } / "" { return 0; }
+= (OPM [0-9,.]* "S"i) { return parseFloat(text()) } / "" { return 0; }
+
+OptIsoSecondDur
+= (OPM [0-9] [0-9]) { return parseFloat(text()) }
 
 OptYearDur
- = (OPM [0-9,.]* "Y") { return parseFloat(text()) } / "" { return 0; }
+ = (OPM [0-9,.]* "Y"i) { return parseFloat(text()) } / "" { return 0; }
 
- OptMonthDur
-  = (OPM [0-9,.]* "M") { return parseFloat(text()) } / "" { return 0; }
+OptIsoYearDur
+= (OPM [0-9] [0-9] [0-9] [0-9]) { return parseFloat(text()) }
+
+OptMonthDur
+= (OPM [0-9,.]* "M"i) { return parseFloat(text()) } / "" { return 0; }
+
+OptIsoMonthDur
+= (OPM [0-9] [0-9]) { return parseFloat(text()) }
 
 OptWeekDur
- = (OPM [0-9,.]* "W") { return parseFloat(text()) } / "" { return 0; }
+= (OPM [0-9,.]* "W"i) { return parseFloat(text()) } / "" { return 0; }
 
- OptDayDur
-  = (OPM [0-9,.]* "D") { return parseFloat(text()) } / "" { return 0; }
+OptDayDur
+= (OPM [0-9,.]* "D"i) { return parseFloat(text()) } / "" { return 0; }
+
+OptIsoDayDur
+= (OPM [0-9] [0-9]) { return parseFloat(text()) }
 
 OPM "optionalplusminus"
   = ("+" / "-" / "")
@@ -126,7 +164,7 @@ CompleteDate "completedate"
 ProperIsoDate "properiso"
   = v:IsoLeapSeconds { return options.makeDate(v); }  /
     date:ValidIsoDate time:ProperIsoTime
-  { return options.makeDate(new Date(`${date.year}-${date.month}-${date.day}T${time[0].hours}:${time[0].minutes}:${time[0].seconds}${time[1]}`), { type: NATIVEDATE, parser: "properiso" }); }
+  { return options.makeDate(new Date(`${date.year}-${date.month}-${date.day}T${time[0].hours}:${time[0].minutes}:${time[0].seconds}.${time[0].milliseconds}${time[1]}`), { type: NATIVEDATE, parser: "properiso" }); }
 
 OrdinalIsoDate
   = year:IsoYear "-"? days:(
@@ -141,11 +179,15 @@ ProperIsoTime
  time:(IsoTimeSeperator
  hours:("2" [0-3] / "1" [0-9] / "0" [0-9])
    ms:(":"? minutes:([0-5][0-9])
-     seconds:(":"? seconds:([0-5][0-9]) { return seconds.join(""); })?
-   { return { minutes: (minutes.join("")), seconds: seconds || "00"}; }
-     )? { return Object.assign({ hours: (hours.join("")), minutes: "00", seconds: "00" }, ms || {}); }
+     seconds:(":"?
+      seconds:([0-5][0-9])
+      milliseconds:("."? milliseconds:MillisecondExpression
+        { return milliseconds.join("") || "000" })?
+      { return { seconds: seconds.join(""), milliseconds: milliseconds || "000" }; })?
+   { return { minutes: (minutes.join("")), seconds: seconds ? seconds.seconds : "00", milliseconds: seconds ? seconds.milliseconds : "000" }; }
+     )? { return Object.assign({ hours: (hours.join("")), minutes: "00", seconds: "00", milliseconds: "000" }, ms || {}); }
  )?
- timezone:(Timezone { return text(); })? { return [time || { hours: "00", minutes: "00", seconds: "00" }, timezone || ""]; })
+ timezone:(Timezone { return text(); })? { return [time || { hours: "00", minutes: "00", seconds: "00", milliseconds: "000" }, timezone || ""]; })
 
 IsoTimezone
   = "Z"i / PlusOrMinues [0-9][0-9] ":"? [0-9][0-9]
@@ -330,13 +372,13 @@ ShortminutesAlt "shortminutesalt"
 
 
 Shorterminutes "shorterminutes"
-  = Number _ "mm" "s"? { return options.makeDuration({ minutes: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+  = Number _ "m" "m"i? "s"? { return options.makeDuration({ minutes: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
 
 Hour "hour"
   = Number _ "hour"i "s"? { return options.makeDuration({ hours: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
 
 Shorthour "shorthour"
-  = Number _ "h"i "s"? { return options.makeDuration({ hours: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
+  = Number _ "h"i "h"i? "s"? { return options.makeDuration({ hours: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
 
 Day "day"
   = Number _ "day"i "s"? { return options.makeDuration({ days: parseFloat(text(), 10) }, { type: DURATIONOBJECT }); }
@@ -375,11 +417,14 @@ Number "number"
 Integer "integer"
   = _ [0-9]+ { return { unitless: parseInt(text(), 10) }; }
 
+UnitlessNumber "unitlessnumber"
+  = _ sign:("+" / "-" / "") n:Number { return { unitless: sign === "-" ? -1 * n.unitless : n.unitless }; }
+
 Int "int"
   = [0-9]+
 
 Float "float"
-  = _ [0-9]+Dot[0-9]+ { return { unitless: parseFloat(text(), 10) }; }
+  = _ [0-9]+ Dot [0-9]+ { return { unitless: parseFloat(text(), 10) }; }
 
 Dot "dot"
   = "."

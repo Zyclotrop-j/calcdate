@@ -40,6 +40,15 @@ export const simpleluxon = (
           try {
             const maybedateobject = JSON.parse(a);
             if (Array.isArray(maybedateobject)) {
+              if (
+                typeof maybedateobject[0] === "string" &&
+                typeof maybedateobject[1] === "string"
+              ) {
+                return DateTime.fromFormat(
+                  maybedateobject[0],
+                  maybedateobject[1]
+                );
+              }
               return DateTime.fromObject(
                 maybedateobject[0],
                 maybedateobject[1]
