@@ -122,21 +122,21 @@ Durations may be written in iso as `PnYnMnDTnHnMnS` (where `n` is a any number).
 From [wikipedia](https://en.wikipedia.org/wiki/ISO_8601#Durations):
 
 > P is the duration designator (for period) placed at the start of the duration representation.
-
+>
 > Y is the year designator that follows the value for the number of years.
-
+>
 > M is the month designator that follows the value for the number of months.
-
+>
 > W is the week designator that follows the value for the number of weeks.
-
+>
 > D is the day designator that follows the value for the number of days.
-
+>
 > T is the time designator that precedes the time components of the representation.
-
+>
 > H is the hour designator that follows the value for the number of hours.
-
+>
 > M is the minute designator that follows the value for the number of minutes.
-
+>
 > S is the second designator that follows the value for the number of seconds.
 
 "+" and "-" are allowed for the entire expression and parts individually. Thus `+P1Y` (1 year), `-P1Y` (minus 1 year) and `-P-1y` (minus minus 1 year = 1 year) are valid.
