@@ -178,7 +178,7 @@ P0002-10--15 // 2 years, 10 months, -15 days
 ```
 
 **Note**
-The time designator is **mandatory** when denoting times, so `P1H` would be _invalid_ while _PT1H_ would be fine.
+The time designator is **mandatory** when denoting times, so `P1H` would be _invalid_ while `PT1H` would be fine.
 
 ##### Binding depended
 
