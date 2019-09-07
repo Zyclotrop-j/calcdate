@@ -363,7 +363,7 @@ On top there is the keywords "now" (alias "today", both case-insensitive), which
 | -------- | ------------------ | ---------------------------------- |
 | 1        | Interval           | 2009-12T12:34/20090519 143922+0600 |
 | 2        | now, today         | now, now(), Today                  |
-| 2        | Custom Constructor | {....}, [....], ~....~             |
+| 2        | Custom Constructor | {....}, [....], \~....\~           |
 | 2        | Duration           | P1D                                |
 | 2        | Date-Time          | 2019                               |
 | 2        | Duration shorthand | 1 day                              |
