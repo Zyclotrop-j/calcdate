@@ -85,6 +85,10 @@ A datetime is an exact point in time. It can be expressed as a ISO-8601-date-tim
 20070406 0000 // Fri Apr 06 2007 00:00:00 GMT+1000 (Australian Eastern Standard Time)
 ```
 
+##### Binding depended
+
+Each parser may provide its own parsing-from-string mechanism using `{....}`-notation.
+
 #### Duration
 
 A duration expresses a time-period, aka "how long". A duration may be expressed using an iso-duration or the short-hand notation as follows.
@@ -182,7 +186,7 @@ The time designator is **mandatory** when denoting times, so `P1H` would be _inv
 
 ##### Binding depended
 
-Each parser may provide its own parsing-from-string mechanism using `{....}`-notation.
+Each parser may provide its own parsing-from-string mechanism using `[....]`-notation.
 
 **Example**
 `{["2012 juillet", "YYYY MMM", "fr"]}` + moment-bindings
@@ -212,6 +216,10 @@ For more examples, combine any date-time example with another date-time-example 
 
 **Note**
 Note all bindings support intervals!
+
+##### Binding depended
+
+Each parser may provide its own parsing-from-string mechanism using `~....~`-notation.
 
 #### Unitless
 
