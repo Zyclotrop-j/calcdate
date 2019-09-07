@@ -21,14 +21,14 @@ TBD
 
 There are **no direct dependencies**!
 
-If you want to use it with the date-time framework of your choice, you can use the bindings provided.
+We recommend using this lib with your favorite date-time lib, use the bindings provided.
 
-| import                | required dependency                      |
-| --------------------- | ---------------------------------------- |
-| datefnsCalculator     | [date-fns](https://date-fns.org)         |
-| luxonCalculator       | [luxon](https://moment.github.io/luxon/) |
-| simpleluxonCalculator | [luxon](https://moment.github.io/luxon/) |
-| momentCalculator      | [moment](https://momentjs.com/)          |
+| import                | required dependency                      | import                                                  |
+| --------------------- | ---------------------------------------- | ------------------------------------------------------- |
+| datefnsCalculator     | [date-fns](https://date-fns.org)         | `import { datefnsCalculator } from "datecalculator`     |
+| luxonCalculator       | [luxon](https://moment.github.io/luxon/) | `import { luxonCalculator } from "datecalculator`       |
+| simpleluxonCalculator | [luxon](https://moment.github.io/luxon/) | `import { simpleluxonCalculator } from "datecalculator` |
+| momentCalculator      | [moment](https://momentjs.com/)          | `import { momentCalculator } from "datecalculator`      |
 
 ## Examples
 
