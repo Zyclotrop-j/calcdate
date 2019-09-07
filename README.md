@@ -338,9 +338,15 @@ Adds two "things". The binding implementation defines what "add" means and if it
 
 #### Subtract ("minus", "-")
 
+TBD
+
 #### Multiply ("\*")
 
+TBD
+
 #### Divide ("/")
+
+TBD
 
 ### Other
 
