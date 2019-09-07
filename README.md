@@ -391,7 +391,7 @@ const yourCalculator = calculatorFactory({
     add: ...,
     subtract: ...,
     multiply: ...,
-    minus: ...
+    divide: ...
 });
 ```
 
@@ -424,7 +424,7 @@ You function to create a new date. It can take the following two signatures:
 
 - `now + 1 day` - `add(a: YourDateType, b: YourDurationType)`
 - `now + 1` - `add(a: YourDateType, { unitless: 1 } : { unitless: Number })`
-- `P3Y6M4DT12H30M5S + { 1 day }` - `add(a: YourDurationType, b: YourDurationType)`
+- `P3Y6M4DT12H30M5S + 1 day` - `add(a: YourDurationType, b: YourDurationType)`
 - `2019-01-01/2019-01-02 + now` - `add(a: YourIntervalType, b: YourDateType)`
 - `${new RegExp("foobar")} + ~hello world~` - `add(a: any, b: YourIntervalType)`
 - `1d + 1h + 1m` - `add(add(a: YourDurationType, b: YourDurationType), x: YourDurationType)`
@@ -436,10 +436,40 @@ You **should** throw (helpful) errors when you can't make sense of the arguments
 
 `subtract(a, b) : c`, where `a, b, c` are `YourDateType | YourDurationType | YourIntervalType | { unitless: Number } | any`
 
+- `now - 1 day` - `subtract(a: YourDateType, b: YourDurationType)`
+- `now - 1` - `subtract(a: YourDateType, { unitless: 1 } : { unitless: Number })`
+- `P3Y6M4DT12H30M5S - 1 day` - `subtract(a: YourDurationType, b: YourDurationType)`
+- `2019-01-01/2019-01-02 - now` - `subtract(a: YourIntervalType, b: YourDateType)`
+- `${new RegExp("foobar")} - ~hello world~` - `subtract(a: any, b: YourIntervalType)`
+- `1d - 1h - 1m` - `subtract(add(a: YourDurationType, b: YourDurationType), x: YourDurationType)`
+
+**Note**
+You **should** throw (helpful) errors when you can't make sense of the arguments. For example substracting a duration from a date makes sense - substracting a date from a duration might not!
+
 ### multiply
 
 `multiply(a, b) : c`, where `a, b, c` are `YourDateType | YourDurationType | YourIntervalType | { unitless: Number } | any`
 
-### minus
+- `now * 1 day` - `multiply(a: YourDateType, b: YourDurationType)`
+- `now * 1` - `multiply(a: YourDateType, { unitless: 1 } : { unitless: Number })`
+- `P3Y6M4DT12H30M5S * 1 day` - `multiply(a: YourDurationType, b: YourDurationType)`
+- `2019-01-01/2019-01-02 * now` - `multiply(a: YourIntervalType, b: YourDateType)`
+- `${new RegExp("foobar")} * ~hello world~` - `multiply(a: any, b: YourIntervalType)`
+- `1d * 1h * 1m` - `multiply(add(a: YourDurationType, b: YourDurationType), x: YourDurationType)`
 
-`minus(a, b) : c`, where `a, b, c` are `YourDateType | YourDurationType | YourIntervalType | { unitless: Number } | any`
+**Note**
+You **should** throw (helpful) errors when you can't make sense of the arguments. For example multiplying a duration by a unitless makes sense - multiplying a duration by another might not!
+
+### divide
+
+`divide(a, b) : c`, where `a, b, c` are `YourDateType | YourDurationType | YourIntervalType | { unitless: Number } | any`
+
+- `now / 1 day` - `divide(a: YourDateType, b: YourDurationType)`
+- `now / 1` - `divide(a: YourDateType, { unitless: 1 } : { unitless: Number })`
+- `P3Y6M4DT12H30M5S / 1 day` - `divide(a: YourDurationType, b: YourDurationType)`
+- `2019-01-01/2019-01-02 / now` - `divide(a: YourIntervalType, b: YourDateType)`
+- `${new RegExp("foobar")} / ~hello world~` - `divide(a: any, b: YourIntervalType)`
+- `1d / 1h / 1m` - `divide(add(a: YourDurationType, b: YourDurationType), x: YourDurationType)`
+
+**Note**
+You **should** throw (helpful) errors when you can't make sense of the arguments. For example dividing a duration by another might make sense (could be "how many durations x fit into duration y") - dividing a unitless by an interval might not!
