@@ -355,6 +355,28 @@ Additionally `(` + `)` is permitted to group any expression and give its evaluat
 **Example**
 `( 1d - 5h ) * 2`
 
+On top there is the keywords "now" (alias "today", both case-insensitive), which creates a Date-Time with the value of "now".
+
+### Operator precedence
+
+| Priority | Expression         | Example                            |
+| -------- | ------------------ | ---------------------------------- |
+| 1        | Interval           | 2009-12T12:34/20090519 143922+0600 |
+| 2        | now, today         | now, now(), Today                  |
+| 2        | Custom Constructor | {....}, [....], ~....~             |
+| 2        | Duration           | P1D                                |
+| 2        | Date-Time          | 2019                               |
+| 2        | Duration shorthand | 1 day                              |
+| 3        | Unitless           | 1                                  |
+| 4        | Brackets           | ( .... )                           |
+| 5        | Multiply           | .. \* ..                           |
+| 5        | Divide             | .. / ..                            |
+| 6        | Plus               | .. + ..                            |
+| 6        | Minus              | .. - ..                            |
+
+This order insures that `2019/P1D` is an interval while `2019 / P1D` means "divide 2019 by P1D".
+It also care to interpret `2019-08` as "August of 2019", while `2019 - 08` means "The date 2019 minus unitless 8".
+
 ## Bring your own lib
 
 The date-calculator itself is not bound to any library. You can 'teach' it to work with any library by implementing 'bindings'. To create a new calculator type import the calculatorFactory (aka "parser") and call it with your bindings (see below).
