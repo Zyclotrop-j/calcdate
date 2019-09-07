@@ -377,7 +377,7 @@ On top there is the keywords "now" (alias "today", both case-insensitive), which
 This order insures that `2019/P1D` is an interval while `2019 / P1D` means "divide 2019 by P1D".
 It also care to interpret `2019-08` as "August of 2019", while `2019 - 08` means "The date 2019 minus unitless 8".
 
-## Bring your own lib
+## Bring your own lib date-lib
 
 The date-calculator itself is not bound to any library. You can 'teach' it to work with any library by implementing 'bindings'. To create a new calculator type import the calculatorFactory (aka "parser") and call it with your bindings (see below).
 
