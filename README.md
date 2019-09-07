@@ -13,6 +13,10 @@ simpleCalculator`now + 3 days + 5 hours`;
 
 TBD
 
+## git repo
+
+[Find source code on git](https://github.com/Zyclotrop-j/DateCalculator)
+
 ## Dependencies
 
 There are **no direct dependencies**!
