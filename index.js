@@ -17,26 +17,31 @@ export const simpleCalculator = parser(
     console: customConsole
   })
 );
+export const calc = simpleCalculator;
 export const datefnsCalculator = parser(
   datefns(parser, {
     console: customConsole
   })
 );
+export const datefnscalc = datefnsCalculator;
 export const luxonCalculator = parser(
   luxon(parser, {
     console: customConsole
   })
 );
+export const luxoncalc = luxonCalculator;
 export const simpleluxonCalculator = parser(
   simpleluxon(parser, {
     console: customConsole
   })
 );
+export const luxonsimplecalc = simpleluxonCalculator;
 export const momentCalculator = parser(
   moment(parser, {
     console: customConsole
   })
 );
+export const momentcalc = momentCalculator;
 export default parser(
   simple(parser, {
     console: customConsole

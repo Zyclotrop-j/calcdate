@@ -1,7 +1,7 @@
 {
   "name": "calcdate",
-  "version": "1.0.0",
-  "description": "Evalate a date expression (\"now + 3 days\")!",
+  "version": "1.0.1",
+  "description": "Evalate a date expression calc`now + 3 days`)!",
   "main": "dist/datecalculator.js",
   "scripts": {
     "build": "webpack",

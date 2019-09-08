@@ -3,15 +3,21 @@
 ## TL;DR
 
 ```
-import { simpleCalculator } from "datecalculator";
+import { calc } from "calcdate";
 // or use any of: datefnsCalculator luxonCalculator simpleluxonCalculator momentCalculator
 
-simpleCalculator`now + 3 days + 5 hours`;
+calc`now + 3 days + 5 hours`;
 ```
 
 ## Install
 
-TBD
+```
+yarn add calcdate
+```
+
+```
+npm i calcdate
+```
 
 ## git repo
 
