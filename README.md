@@ -338,6 +338,11 @@ Adds two "things". The binding implementation defines what "add" means and if it
 
 #### Subtract ("minus", "-")
 
+Subtracts two "things" - binding defines the meaning. Can also be interpreted as a "until", as in "2019 - 2020" yielding an interval between those in some implementations.
+
+**Example**
+`1d - 5h`
+
 | Binding      | Type a   | Type b   | Result          | Notes                                 |
 | ------------ | -------- | -------- | --------------- | ------------------------------------- |
 | simple       | Date     | Date     | Number          | Difference of times in milliseconds   |
@@ -382,6 +387,9 @@ Adds two "things". The binding implementation defines what "add" means and if it
 
 #### Multiply ("\*")
 
+**Example**
+`5d * 3`
+
 | Binding      | Type a   | Type b   | Result          | Notes                            |
 | ------------ | -------- | -------- | --------------- | -------------------------------- |
 | simple       | Duration | Unitless | Duration        |                                  |
@@ -413,34 +421,38 @@ Adds two "things". The binding implementation defines what "add" means and if it
 
 #### Divide ("/")
 
-| Binding      | Type a   | Type b   | Result          | Notes                                       |
-| ------------ | -------- | -------- | --------------- | ------------------------------------------- |
-| simple       | Duration | Unitless | Duration        |                                             |
-| simple       | Unitless | Unitless | Unitless        |                                             |
-| simple       | \*       | \*       | Error           |                                             |
-| -------      | -------- | -------- | --------------- | --------------------------------            |
-| date-fns     | Duration | Unitless | Duration        |                                             |
-| date-fns     | Unitless | Duration | Duration        | Inverts each duration part                  |
-| date-fns     | Duration | Duration | Unitless        | Loses accuracy due to conversion            |
-| date-fns     | Unitless | Unitless | Unitless        |                                             |
-| date-fns     | \*       | \*       | Error           |                                             |
-| -------      | -------- | -------- | --------------- | --------------------------------            |
-| luxon        | Date     | Date     | Interval        | Interval(start: Date a, end: Date b)        |
-| luxon        | Interval | Unitless | Interval        | Reduces interval to 1/n-th the size it was  |
-| luxon        | Duration | Duration | Unitless        | Loses accuracy due to conversion            |
-| luxon        | Duration | Unitless | Duration        |                                             |
-| luxon        | Unitless | Duration | Duration        | Inverts each duration part                  |
-| luxon        | Interval | 1u       | Interval        | Swops the interval (start->end, end->start) |
-| luxon        | Unitless | Unitless | Unitless        |                                             |
-| luxon        | \*       | \*       | Error           |                                             |
-| -------      | -------- | -------- | --------------- | --------------------------------            |
-| simple-luxon | Duration | Unitless | Duration        |                                             |
-| simple-luxon | Unitless | Unitless | Unitless        |                                             |
-| simple-luxon | \*       | \*       | Error           |                                             |
-| -------      | -------- | -------- | --------------- | --------------------------------            |
-| moment       | Duration | Unitless | Duration        |                                             |
-| moment       | Unitless | Unitless | Unitless        |                                             |
-| moment       | \*       | \*       | Error           |                                             |
+Divide things Split "things" into `n` equal parts.
+
+| Binding      | Type a   | Type b   | Result          | Notes                                        |
+| ------------ | -------- | -------- | --------------- | -------------------------------------------- |
+| simple       | Duration | Unitless | Duration        |                                              |
+| simple       | Unitless | Unitless | Unitless        |                                              |
+| simple       | \*       | \*       | Error           |                                              |
+| -------      | -------- | -------- | --------------- | --------------------------------             |
+| date-fns     | Duration | Unitless | Duration        |                                              |
+| date-fns     | Unitless | Duration | Duration        | Inverts each duration part                   |
+| date-fns     | Duration | Duration | Unitless        | Loses accuracy due to conversion             |
+| date-fns     | Unitless | Unitless | Unitless        |                                              |
+| date-fns     | \*       | \*       | Error           |                                              |
+| -------      | -------- | -------- | --------------- | --------------------------------             |
+| luxon        | Date     | Date     | Interval        | Interval(start: Date a, end: Date b)         |
+| luxon        | Interval | Unitless | Duration        | Duration c fits Unitless times into Interval |
+| luxon        | Interval | Duration | Unitless        | Duration b fits Unitless times into Interval |
+| luxon        | Interval | Unitless | Duration        |                                              |
+| luxon        | Duration | Duration | Unitless        | Loses accuracy due to conversion             |
+| luxon        | Duration | Unitless | Duration        |                                              |
+| luxon        | Unitless | Duration | Duration        | Inverts each duration part                   |
+| luxon        | Interval | 1u       | Interval        | Swops the interval (start->end, end->start)  |
+| luxon        | Unitless | Unitless | Unitless        |                                              |
+| luxon        | \*       | \*       | Error           |                                              |
+| -------      | -------- | -------- | --------------- | --------------------------------             |
+| simple-luxon | Duration | Unitless | Duration        |                                              |
+| simple-luxon | Unitless | Unitless | Unitless        |                                              |
+| simple-luxon | \*       | \*       | Error           |                                              |
+| -------      | -------- | -------- | --------------- | --------------------------------             |
+| moment       | Duration | Unitless | Duration        |                                              |
+| moment       | Unitless | Unitless | Unitless        |                                              |
+| moment       | \*       | \*       | Error           |                                              |
 
 ### Other
 
