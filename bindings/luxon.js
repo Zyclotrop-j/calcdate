@@ -334,6 +334,27 @@ export const luxon = (
         console.warn(`Dividing one duration by another is potentially unsafe!`);
         return { unitless: a.valueOf() / b.valueOf() };
       }
+      if (Interval.isInterval(a) && isUnitless(b)) {
+        return a
+          .divideEqually(b.unitless)[0]
+          .toDuration(
+            [
+              "years",
+              "months",
+              "days",
+              "hours",
+              "minutes",
+              "seconds",
+              "milliseconds"
+            ],
+            {
+              conversionAccuracy: "longterm"
+            }
+          );
+      }
+      if (Interval.isInterval(a) && Duration.isDuration(b)) {
+        return { unitless: a.splitBy(b).length };
+      }
       if (
         DateTime.isDateTime(a) &&
         a.isValid &&
