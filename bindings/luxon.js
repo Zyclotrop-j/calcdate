@@ -121,10 +121,10 @@ export const luxon = (
         return a.union(b);
       }
       if (Interval.isInterval(a) && Duration.isDuration(b)) {
-        return Interval.fromDateTimes(a.start.plus(b), a.end.plus(b));
+        return a.mapEndpoints(ep => ep.plus(b));
       }
       if (Interval.isInterval(b) && Duration.isDuration(a)) {
-        return Interval.fromDateTimes(b.start.plus(a), b.end.plus(a));
+        return b.mapEndpoints(ep => ep.plus(a));
       }
       if (Interval.isInterval(a) && DateTime.isDateTime(b)) {
         if (a.isAfter(b)) {
@@ -186,7 +186,7 @@ export const luxon = (
           return Interval.fromDateTimes(a.end, b);
         }
         if (a.isAfter(b)) {
-          return a;
+          return Interval.fromDateTimes(b, a.start);
         }
         return Interval.fromDateTimes(a.start, b);
       }
@@ -241,6 +241,60 @@ export const luxon = (
         );
         return b.set(tmp);
       }
+      if (Interval.isInterval(a) && isUnitless(b)) {
+        const tmp = Object.entries(
+          a
+            .toDuration(
+              [
+                "years",
+                "months",
+                "days",
+                "hours",
+                "minutes",
+                "seconds",
+                "milliseconds"
+              ],
+              {
+                conversionAccuracy: "longterm"
+              }
+            )
+            .toObject()
+        ).reduce(
+          (p, [k, v]) =>
+            Object.assign(p, {
+              [k]: v * b.unitless
+            }),
+          {}
+        );
+        return Interval.fromDateTimes(a.start, a.end.plus(tmp));
+      }
+      if (Interval.isInterval(b) && isUnitless(a)) {
+        const tmp = Object.entries(
+          b
+            .toDuration(
+              [
+                "years",
+                "months",
+                "days",
+                "hours",
+                "minutes",
+                "seconds",
+                "milliseconds"
+              ],
+              {
+                conversionAccuracy: "longterm"
+              }
+            )
+            .toObject()
+        ).reduce(
+          (p, [k, v]) =>
+            Object.assign(p, {
+              [k]: v * a.unitless
+            }),
+          {}
+        );
+        return Interval.fromDateTimes(b.start.minus(tmp), b.end);
+      }
       const e = `Invalid arguments for multiply, expected (duration, unitless) or (unitless, duration) but found (${
         a.invalidExplanation ? `Invalid date ${a.invalidExplanation}` : typeof a
       }, ${
@@ -252,6 +306,9 @@ export const luxon = (
     divide: (a, b) => {
       if (isUnitless(a) && isUnitless(b)) {
         return { unitless: a.unitless / b.unitless };
+      }
+      if (isUnitless(a) && a.unitless === 1 && Interval.isInterval(b)) {
+        return Interval.fromDateTimes(b.end, b.start);
       }
       if (Duration.isDuration(a) && isUnitless(b)) {
         const tmp = Object.entries(a.toObject()).reduce(
@@ -267,7 +324,7 @@ export const luxon = (
         const tmp = Object.entries(b.toObject()).reduce(
           (p, [k, v]) =>
             Object.assign(p, {
-              [k]: v / a.unitless
+              [k]: a.unitless / v
             }),
           {}
         );
@@ -276,6 +333,41 @@ export const luxon = (
       if (Duration.isDuration(a) && Duration.isDuration(b)) {
         console.warn(`Dividing one duration by another is potentially unsafe!`);
         return { unitless: a.valueOf() / b.valueOf() };
+      }
+      if (
+        DateTime.isDateTime(a) &&
+        a.isValid &&
+        DateTime.isDateTime(b) &&
+        b.isValid
+      ) {
+        return Interval.fromDateTimes(a, b);
+      }
+      if (Interval.isInterval(a) && isUnitless(b)) {
+        const tmp = Object.entries(
+          a
+            .toDuration(
+              [
+                "years",
+                "months",
+                "days",
+                "hours",
+                "minutes",
+                "seconds",
+                "milliseconds"
+              ],
+              {
+                conversionAccuracy: "longterm"
+              }
+            )
+            .toObject()
+        ).reduce(
+          (p, [k, v]) =>
+            Object.assign(p, {
+              [k]: v * (b.unitless / 2)
+            }),
+          {}
+        );
+        return Interval.fromDateTimes(a.start.plus(tmp), a.end.minus(tmp));
       }
       const e = `Invalid arguments for divide, expected (duration, unitless) or (unitless, duration) but found (${
         a.invalidExplanation ? `Invalid date ${a.invalidExplanation}` : typeof a

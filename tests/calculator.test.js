@@ -782,4 +782,40 @@ describe("Parsing without a binding", () => {
       expect(calculator`-006.089`).toEqual({ unitless: -6.089 });
     });
   });
+
+  describe("Parses dates, durations and intervals in all combinations and operations", () => {
+    const typemix = [
+      "P20080915T155300",
+      "-P20080915T155300",
+      "P2008-09-15T15:53:00",
+      "-P2008-09-15T15:53:00",
+      "P2y10m14dT20h13m45s",
+      "-P2y10m14dT20h13m45s",
+      "P6w",
+      "20080915T155300/20101113T000000",
+      "P2y10M14dT20h13m45s/20080915T155300",
+      "20080915T155300/P2y10M14dT20h13m45s",
+      "2008-09-15T15:53:00/2010-11-13T00:00:00",
+      "P2y10M14dT20h13m45s/2008-09-15T15:53:00",
+      "2008-09-15T15:53:00/P2y10M14dT20h13m45s",
+      "20080915T155300",
+      "2008-09-15T15:53:00+04:30"
+    ];
+    typemix.forEach(t1 => {
+      it(` parses ${t1}`, () => {
+        expect(calculator(t1)).toBeDefined();
+        typemix.forEach(t2 => {
+          expect(calculator(`${t1} + ${t2}`)).toBeDefined();
+          expect(calculator(`${t1} - ${t2}`)).toBeDefined();
+          expect(calculator(`${t1} * ${t2}`)).toBeDefined();
+          expect(calculator(`${t1} / ${t2}`)).toBeDefined();
+
+          expect(calculator(`${t2} / (${t1} + ${t2})`)).toBeDefined();
+          expect(calculator(`${t2} * (${t1} - ${t2})`)).toBeDefined();
+          expect(calculator(`(${t2} + ${t1}) * ${t2}`)).toBeDefined();
+          expect(calculator(`(${t2} - ${t1}) / ${t2}`)).toBeDefined();
+        });
+      });
+    });
+  });
 });

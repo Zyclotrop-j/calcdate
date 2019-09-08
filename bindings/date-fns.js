@@ -34,9 +34,9 @@ const divTable = {
   days: 1000 * 60 * 60 * 24,
   weekdays: 1000 * 60 * 60 * 24,
   weeks: 1000 * 60 * 60 * 24 * 7,
-  months: 1000 * 60 * 60 * 24 * 31,
-  quarters: (1000 * 60 * 60 * 24 * 7 * 52) / 4,
-  years: 1000 * 60 * 60 * 24 * 7 * 52
+  months: 1000 * 60 * 60 * 24 * 30.436875,
+  quarters: 1000 * 60 * 60 * 24 * 91.310625,
+  years: 1000 * 60 * 60 * 24 * 365.2425
 };
 Object.fromEntries =
   Object.fromEntries ||
@@ -272,7 +272,7 @@ export const datefns = (
         return Object.entries(b).reduce(
           (p, [k, v]) =>
             Object.assign(p, {
-              [k]: v / a.unitless
+              [k]: a.unitless / v
             }),
           newDuration()
         );
