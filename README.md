@@ -4,7 +4,10 @@
 
 ```
 import { calc } from "calcdate";
-// or use any of: datefnsCalculator luxonCalculator simpleluxonCalculator momentCalculator
+// import { datefnscalc } from "calcdate"; // with date-fns
+// import { luxoncalc } from "calcdate"; // with luxon
+// import { luxonsimplecalc } from "calcdate"; // with luxon
+// import { momentcalc } from "calcdate"; // with moment
 
 calc`now + 3 days + 5 hours`;
 ```
