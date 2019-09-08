@@ -24,20 +24,20 @@ npm i calcdate
 
 ## git repo
 
-[Find source code on git](https://github.com/Zyclotrop-j/DateCalculator)
+[Find source code on git](https://github.com/Zyclotrop-j/calcdate)
 
 ## Dependencies
 
 There are **no direct dependencies**!
 
-We recommend using this lib with your favorite date-time lib, use the bindings provided.
+We recommend using this lib with your favourite date-time lib, use the bindings provided.
 
-| import                | required dependency                      | import                                                    |
-| --------------------- | ---------------------------------------- | --------------------------------------------------------- |
-| datefnsCalculator     | [date-fns](https://date-fns.org)         | `import { datefnsCalculator } from "datecalculator";`     |
-| luxonCalculator       | [luxon](https://moment.github.io/luxon/) | `import { luxonCalculator } from "datecalculator";`       |
-| simpleluxonCalculator | [luxon](https://moment.github.io/luxon/) | `import { simpleluxonCalculator } from "datecalculator";` |
-| momentCalculator      | [moment](https://momentjs.com/)          | `import { momentCalculator } from "datecalculator";`      |
+| import                | required dependency                      | import                                              |
+| --------------------- | ---------------------------------------- | --------------------------------------------------- |
+| datefnsCalculator     | [date-fns](https://date-fns.org)         | `import { datefnsCalculator } from "calcdate";`     |
+| luxonCalculator       | [luxon](https://moment.github.io/luxon/) | `import { luxonCalculator } from "calcdate";`       |
+| simpleluxonCalculator | [luxon](https://moment.github.io/luxon/) | `import { simpleluxonCalculator } from "calcdate";` |
+| momentCalculator      | [moment](https://momentjs.com/)          | `import { momentCalculator } from "calcdate";`      |
 
 ## Examples
 
@@ -497,7 +497,7 @@ It also care to interpret `2019-08` as "August of 2019", while `2019 - 08` means
 The date-calculator itself is not bound to any library. You can 'teach' it to work with any library by implementing 'bindings'. To create a new calculator type import the calculatorFactory (aka "parser") and call it with your bindings (see below).
 
 ```
-import calculatorFactory from "./dateCalculator";
+import calculatorFactory from "./calcdate";
 
 const yourCalculator = calculatorFactory({
     makeDate: ...,
