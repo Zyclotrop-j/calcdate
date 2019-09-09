@@ -2,6 +2,8 @@
 
 ## TL;DR
 
+### ES6
+
 ```
 import { calc } from "calcdate";
 // import { datefnscalc } from "calcdate"; // with date-fns
@@ -10,6 +12,23 @@ import { calc } from "calcdate";
 // import { momentcalc } from "calcdate"; // with moment
 
 calc`now + 3 days + 5 hours`;
+```
+
+### Node
+
+```
+const calc = require("calcdate").default;
+// const calc = require("calcdate").luxoncalc;
+calc`now + 3 days + 5 hours`;
+```
+
+### runkit api
+
+```
+https://embed-sw29njl68eg5.runkit.sh/P1d
+// https://embed-sw29njl68eg5.runkit.sh/datefns/now+5d
+// https://embed-sw29njl68eg5.runkit.sh/moment/now+5d
+// https://embed-sw29njl68eg5.runkit.sh/luxon/now+5d
 ```
 
 ## Install
@@ -25,6 +44,10 @@ npm i calcdate
 ## git repo
 
 [Find source code on git](https://github.com/Zyclotrop-j/calcdate)
+
+![Bundle size](https://badgen.net/bundlephobia/minzip/react "Bundle size")
+
+[![CircleCI](https://circleci.com/gh/Zyclotrop-j/calcdate/tree/master.svg?style=svg)](https://circleci.com/gh/Zyclotrop-j/calcdate/tree/master)
 
 ## Dependencies
 
