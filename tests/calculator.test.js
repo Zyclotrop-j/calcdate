@@ -574,14 +574,14 @@ describe("Parsing without a binding", () => {
       it(` parse "${i}" successfully`, () => {
         const result = calculator`${i}`;
         expect(result).toBeDefined();
-        expect(`${i} = ${result.date}`).toMatchSnapshot();
+        expect(`${i} = ${result.date.getTime()}`).toMatchSnapshot();
       })
     );
     iso.forEach((i, idx) =>
       it(` parse "${i}" successfully`, () => {
         const result = calculator`${i}`;
         expect(result).toBeDefined();
-        expect(`${i} = ${result.date}`).toMatchSnapshot();
+        expect(`${i} = ${result.date.getTime()}`).toMatchSnapshot();
       })
     );
 
@@ -694,7 +694,6 @@ describe("Parsing without a binding", () => {
       "2009-12T12:34",
       "2009",
       "2009-05-19",
-      " 2009-05-19 ",
       "2009-05",
       "2009-001",
       "2009-05-19",
@@ -708,7 +707,6 @@ describe("Parsing without a binding", () => {
       "200912T1234",
       "2009",
       "20090519",
-      " 20090519 ",
       "200905",
       "2009001",
       "20090519",
@@ -728,8 +726,10 @@ describe("Parsing without a binding", () => {
           if (a === b) return;
           const result = calculator`${a}/${b}`;
           expect(result).toBeDefined();
+          expect(result.interval[0].date).toBeDefined();
+          expect(result.interval[1].date).toBeDefined();
           expect(
-            `${a}/${b} = ${JSON.stringify(result.duration)}`
+            `${a}/${b} = ${result.interval[0].date.getTime()}/${result.interval[1].date.getTime()}`
           ).toMatchSnapshot();
         });
       });
@@ -739,13 +739,21 @@ describe("Parsing without a binding", () => {
         dates.forEach(date => {
           const result = calculator`${date}/${duration}`;
           expect(result).toBeDefined();
+          expect(result.interval[0].date).toBeDefined();
+          expect(result.interval[1].duration).toBeDefined();
           expect(
-            `${date}/${duration} = ${JSON.stringify(result.duration)}`
+            `${date}/${duration} = ${result.interval[0].date.getTime()}/${JSON.stringify(
+              result.interval[1].duration
+            )}`
           ).toMatchSnapshot();
           const result2 = calculator`${duration}/${date}`;
           expect(result2).toBeDefined();
+          expect(result2.interval[0].duration).toBeDefined();
+          expect(result2.interval[1].date).toBeDefined();
           expect(
-            `${duration}/${date} = ${JSON.stringify(result2.interval)}`
+            `${duration}/${date} = ${JSON.stringify(
+              result2.interval[0].duration
+            )}/${result2.interval[1].date.getTime()}`
           ).toMatchSnapshot();
         });
       });
