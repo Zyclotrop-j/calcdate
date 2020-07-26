@@ -1,6 +1,6 @@
 {
   "name": "calcdate",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Evalate a date expression calc`now + 3 days`)!",
   "main": "dist/datecalculator.js",
   "scripts": {
