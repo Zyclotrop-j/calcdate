@@ -11,15 +11,21 @@ import { calc } from "calcdate";
 // import { luxonsimplecalc } from "calcdate"; // with luxon
 // import { momentcalc } from "calcdate"; // with moment
 
-calc`now + 3 days + 5 hours`;
+const dval = calc();
+// const dval = momentcalc(moment);
+
+dval`now + 3 days + 5 hours`;
 ```
 
 ### Node
 
 ```
 const calc = require("calcdate").default;
-// const calc = require("calcdate").luxoncalc;
-calc`now + 3 days + 5 hours`;
+// const luxoncalc = require("calcdate").luxoncalc;
+const dval = calc();
+// const dval = luxoncalc(luxon);
+
+dval`now + 3 days + 5 hours`;
 ```
 
 ### runkit api
@@ -75,6 +81,14 @@ calculator`<expression>`
 ```
 
 where calculator is your imported calculator and expression is what you want calculated. The following section outlines what is permitted in expressions.
+
+### Initializing
+
+The calculator has to be initialized by passing it the library you are usigng it with with.
+```
+const luxon = require("luxon");
+const calculator = require("calcdate").luxoncalc(luxon);
+```
 
 ### Types
 

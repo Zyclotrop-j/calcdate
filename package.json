@@ -5,7 +5,7 @@
   "main": "dist/datecalculator.js",
   "scripts": {
     "build": "webpack",
-    "test": "jest",
+    "test": "env TZ=UTC jest",
     "build:all": "yarn build:browser && yarn build:node",
     "build:browser": "webpack && cp dist/datecalculator.js examples/browser",
     "build:node": "webpack && cp dist/datecalculator.js examples/node/ && node examples/node/example.js"

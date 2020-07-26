@@ -8,8 +8,8 @@ const customConsole = {
   info: console.info.bind(console),
   debug: console.debug.bind(console)
 };
-export const datefnscalc = parser(
-  datefns(parser, {
+export const datefnscalc = lib => parser(
+  datefns(lib)(parser, {
     console: customConsole
   })
 );

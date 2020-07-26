@@ -10,8 +10,8 @@ describe("Timezones", () => {
 });
 
 it("Instanciation works", () => {
-  expect(testbinding({}, {})).toEqual({});
-  expect(parser(testbinding(parser, {}))).toBeInstanceOf(Function);
+  expect(testbinding()({}, {})).toEqual({});
+  expect(parser(testbinding()(parser, {}))).toBeInstanceOf(Function);
 });
 
 describe("Parsing without a binding", () => {
@@ -37,9 +37,9 @@ describe("Parsing without a binding", () => {
     operations.subtract = jest.fn((a, b) => ({ subtract: [a, b] }));
     operations.multiply = jest.fn((a, b) => ({ multiply: [a, b] }));
     operations.divide = jest.fn((a, b) => ({ divide: [a, b] }));
-    calculator = parser(testbinding(parser, operations));
+    calculator = parser(testbinding()(parser, operations));
     /*
-    const xcalc = parser(testbinding(parser, operations));
+    const xcalc = parser(testbinding()(parser, operations));
     calculator = (a, ...args) => {
       try {
         return xcalc(a, ...args);

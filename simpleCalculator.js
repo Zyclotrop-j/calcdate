@@ -8,8 +8,8 @@ const customConsole = {
   info: console.info.bind(console),
   debug: console.debug.bind(console)
 };
-export const simpleCalculator = parser(
-  simple(parser, {
+export const simpleCalculator = lib => parser(
+  simple(lib)(parser, {
     console: customConsole
   })
 );

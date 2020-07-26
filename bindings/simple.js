@@ -1,4 +1,4 @@
-export const simple = ({
+export const simple = /*#__PURE__*/ () => ({
   NATIVEDATE,
   DATEXPRESION,
   DURATIONEXPRESSION,

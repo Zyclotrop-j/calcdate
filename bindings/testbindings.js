@@ -1,4 +1,4 @@
-export const test = (
+export const test = /*#__PURE__*/ () => (
   __,
   { makeInterval, makeDuration, makeDate, add, subtract, multiply, divide }
 ) => {

@@ -8,8 +8,8 @@ const customConsole = {
   info: console.info.bind(console),
   debug: console.debug.bind(console)
 };
-export const luxonsimplecalc = parser(
-  simpleluxon(parser, {
+export const luxonsimplecalc = lib => parser(
+  simpleluxon(lib)(parser, {
     console: customConsole
   })
 );

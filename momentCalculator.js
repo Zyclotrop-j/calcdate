@@ -8,8 +8,8 @@ const customConsole = {
   info: console.info.bind(console),
   debug: console.debug.bind(console)
 };
-export const momentCalculator = parser(
-  moment(parser, {
+export const momentCalculator = lib => parser(
+  moment(lib)(parser, {
     console: customConsole
   })
 );
