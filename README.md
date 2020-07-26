@@ -135,6 +135,10 @@ A datetime is an exact point in time. It can be expressed as a ISO-8601-date-tim
 
 Each parser may provide its own parsing-from-string mechanism using `{....}`-notation.
 
+**Example**
+`{"2012 juillet", "YYYY MMM", "fr"}` + moment-bindings
+`{"12/11/2000", "MM/dd/yyyy"}` + luxon-bindings
+
 #### Duration
 
 A duration expresses a time-period, aka "how long". A duration may be expressed using an iso-duration or the short-hand notation as follows.
@@ -235,8 +239,7 @@ The time designator is **mandatory** when denoting times, so `P1H` would be _inv
 Each parser may provide its own parsing-from-string mechanism using `[....]`-notation.
 
 **Example**
-`{["2012 juillet", "YYYY MMM", "fr"]}` + moment-bindings
-`{["12/11/2000", "MM/dd/yyyy"]}` + luxon-bindings
+`[ {"years": 1, "quarters"": 3, "milliseconds": 27} ]` + luxon-bindings - uses `luxon.Duration.fromObject`
 
 #### Interval
 
@@ -261,11 +264,16 @@ P1Y2M3DT4H05M600S/2009-12T12:34
 For more examples, combine any date-time example with another date-time-example or any duration-example.
 
 **Note**
-Note all bindings support intervals!
+Not all bindings support intervals!
 
 ##### Binding depended
 
 Each parser may provide its own parsing-from-string mechanism using `~....~`-notation.
+
+**Example**
+`~2007-03-01T13:00:00Z/P1Y2M10DT2H30M~` + luxon-bindings - uses `luxon.Interval.fromISO`
+
+
 
 #### Unitless
 
