@@ -88,6 +88,25 @@ Calling the calculator is easy:
 calculator`<expression>`
 ```
 
+**Example**
+
+```
+// Imports
+import { datefnsCalculator } from "calcdate"
+import datefns from "datefns";
+// Setup
+const calculator = datefnsCalculator(datefns);
+
+// Examples:
+calculator`2009-12T12:34`;
+
+calculator`P0002--10-15T10:+30:20`;
+
+calculator`NOW + 7days`;
+
+calculator`2009-12T12:00 - 2019-12T12:00`;
+```
+
 where calculator is your imported calculator and expression is what you want calculated. The following section outlines what is permitted in expressions.
 
 ### Initializing
@@ -343,7 +362,7 @@ luxonCalculator`${DateTime.fromSQL(...)} + ${{ hours: 3, minutes: 13 }}`
 ```
 import moment from 'moment';
 
-luxonCalculator`${moment()} + ${moment.duration(2, 'seconds');}`
+momentCalculator`${moment()} + ${moment.duration(2, 'seconds');}`
 ```
 
 ### Operations
