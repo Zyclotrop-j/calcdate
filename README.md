@@ -10,6 +10,7 @@ import { calc } from "calcdate";
 // import { luxoncalc } from "calcdate"; // with luxon
 // import { luxonsimplecalc } from "calcdate"; // with luxon
 // import { momentcalc } from "calcdate"; // with moment
+// import moment from "moment";
 
 const dval = calc();
 // const dval = momentcalc(moment);
@@ -22,6 +23,7 @@ dval`now + 3 days + 5 hours`;
 ```
 const calc = require("calcdate").default;
 // const luxoncalc = require("calcdate").luxoncalc;
+// import luxon from "luxon";
 const dval = calc();
 // const dval = luxoncalc(luxon);
 
@@ -68,9 +70,15 @@ We recommend using this lib with your favourite date-time lib, use the bindings 
 | simpleluxonCalculator | [luxon](https://moment.github.io/luxon/) | `import { simpleluxonCalculator } from "calcdate";` |
 | momentCalculator      | [moment](https://momentjs.com/)          | `import { momentCalculator } from "calcdate";`      |
 
-## Examples
+**Note**
+You need to initialize the calculator with your library:
 
-TBD
+```
+import { datefnsCalculator } from "calcdate"
+import datefns from "datefns";
+
+const calculator = datefnsCalculator(datefns);
+```
 
 ## Api docs
 
