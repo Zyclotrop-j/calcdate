@@ -54,7 +54,7 @@
     "pegjs": "^0.10.0",
     "preval.macro": "^3.0.0",
     "set-tz": "^0.2.0",
-    "webpack": "^4.4.1",
+    "webpack": "^5.94.0",
     "webpack-cli": "^3.3.7"
   }
 }
